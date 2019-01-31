@@ -21,7 +21,16 @@ jobs:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
-          name: Run Tests
+          name: Run Checkstyle Tests
+          command: ./gradlew checkstyle
+      - run:
+          name: Run Findbugs
+          command: ./gradlew findbugs
+      - run:
+          name: Run PMD Tests
+          command: ./gradlew pmd
+      - run:
+          name: Run Lint Tests
           command: ./gradlew lint test
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: app/build/reports
