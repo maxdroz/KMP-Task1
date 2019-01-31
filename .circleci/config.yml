@@ -25,7 +25,7 @@ jobs:
       - save_cache:
           paths:
             - ~/code
-          key: app-{{ .BuildNum }}
+          key: app-{{ checksum ".circleci/config.yml" }}
 
 #      - run:
 #          name: Run Findbugs
@@ -47,7 +47,7 @@ jobs:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
       - restore_cache:
-          key: app-{{ .BuildNum }}
+          key: app-{{ checksum ".circleci/config.yml" }}
       - run:
           name: Run Checkstyle Tests
           command: ./gradlew checkstyle
@@ -66,7 +66,7 @@ jobs:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
       - restore_cache:
-          key: app-{{ .BuildNum }}
+          key: app-{{ checksum ".circleci/config.yml" }}
       - run:
           name: Run PMD Tests
           command: ./gradlew pmd
@@ -85,7 +85,7 @@ jobs:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
       - restore_cache:
-          key: app-{{ .BuildNum }}
+          key: app-{{ checksum ".circleci/config.yml" }}
       - run:
           name: Run Lint Tests
           command: ./gradlew lint test
@@ -104,7 +104,7 @@ jobs:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
       - restore_cache:
-          key: app-{{ .BuildNum }}
+          key: app-{{ checksum ".circleci/config.yml" }}
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: app/build/reports
           destination: reports
@@ -125,7 +125,7 @@ jobs:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
       - restore_cache:
-          key: app-{{ .BuildNum }}
+          key: app-{{ checksum ".circleci/config.yml" }}
       - run:
           name: Build
           command: ./gradlew assembleRelease
