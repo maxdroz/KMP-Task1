@@ -156,10 +156,9 @@ workflows:
       - build5:
           requires:
             - build1
-      - build6:
-          requires:
-            - build1
             - build2
             - build3
             - build4
+      - build6:
+          requires:
             - build5
