@@ -20,8 +20,7 @@ public class MainActivity extends AppCompatActivity {
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_main);
 
-        AppCenter.start(getApplication(), "537ba06c-9f74-4109-bfa7-18ca47970105",
-                Analytics.class, Crashes.class, Distribute.class);
+        AppCenter.start(getApplication(), "537ba06c-9f74-4109-bfa7-18ca47970105", Analytics.class, Crashes.class, Distribute.class);
 
         TextView link = findViewById(R.id.textView2);
         String href = getResources().getString(R.string.Link);
