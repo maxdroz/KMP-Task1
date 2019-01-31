@@ -24,7 +24,7 @@ jobs:
           name: Run Checkstyle Tests
           command: ./gradlew checkstyle
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: app/build/intermediates/classes
+          path: app/build/intermediates/javac
       - run:
           name: Run Findbugs
           command: ./gradlew findbugs
