@@ -9,8 +9,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-         keys:
-          - jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+         keys: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
 #          - nj-{{ epoch }}
       - run:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
