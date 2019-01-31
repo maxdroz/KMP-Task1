@@ -43,7 +43,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
     steps:
       - restore_cache:
-        key: app-{{ .BuildNum }}
+          key: app-{{ .BuildNum }}
       - run:
           name: Run Checkstyle Tests
           command: ./gradlew checkstyle
@@ -58,7 +58,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
     steps:
       - restore_cache:
-        key: app-{{ .BuildNum }}
+          key: app-{{ .BuildNum }}
       - run:
           name: Run PMD Tests
           command: ./gradlew pmd
@@ -73,7 +73,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
     steps:
       - restore_cache:
-        key: app-{{ .BuildNum }}
+          key: app-{{ .BuildNum }}
       - run:
           name: Run Lint Tests
           command: ./gradlew lint test
@@ -88,7 +88,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
     steps:
       - restore_cache:
-        key: app-{{ .BuildNum }}
+          key: app-{{ .BuildNum }}
       - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
           path: app/build/reports
           destination: reports
@@ -105,7 +105,7 @@ jobs:
       JVM_OPTS: -Xmx3200m
     steps:
       - restore_cache:
-        key: app-{{ .BuildNum }}
+          key: app-{{ .BuildNum }}
       - run:
           name: Build
           command: ./gradlew assembleRelease
