@@ -126,19 +126,19 @@ workflow:
       - build
       - build2:
         requires:
-         - build1
+         - build
       - build3:
         requires:
-         - build1
+         - build
       - build4:
         requires:
-         - build1
+         - build
       - build5:
         requires:
-         - build1
+         - build
       - build6:
         requires:
-         - build1
+         - build
          - build2
          - build3
          - build4
