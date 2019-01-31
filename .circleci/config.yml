@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  build1:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
@@ -123,22 +123,22 @@ workflows:
   version: 2
   build_and_test:
     jobs:
-      - build
+      - build1
       - build2:
         requires:
-         - build
+         - build1
       - build3:
         requires:
-         - build
+         - build1
       - build4:
         requires:
-         - build
+         - build1
       - build5:
         requires:
-         - build
+         - build1
       - build6:
         requires:
-         - build
+         - build1
          - build2
          - build3
          - build4
