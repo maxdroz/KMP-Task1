@@ -51,10 +51,11 @@ jobs:
       - run:
           name: Run Checkstyle Tests
           command: ./gradlew checkstyle
-      - save_cache:
-          paths:
-            - ~
-          key: app-{{ checksum ".circleci/config.yml" }}1
+      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: app/build/reports
+          destination: reports
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: app/build/test-results
 
   build3:
     working_directory: ~/code
@@ -74,10 +75,11 @@ jobs:
       - run:
           name: Run PMD Tests
           command: ./gradlew pmd
-      - save_cache:
-          paths:
-            - ~
-          key: app-{{ checksum ".circleci/config.yml" }}2
+      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: app/build/reports
+          destination: reports
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: app/build/test-results
 
   build4:
     working_directory: ~/code
@@ -97,10 +99,11 @@ jobs:
       - run:
           name: Run Lint Tests
           command: ./gradlew lint test
-      - save_cache:
-          paths:
-            - ~
-          key: app-{{ checksum ".circleci/config.yml" }}3
+      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
+          path: app/build/reports
+          destination: reports
+      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          path: app/build/test-results
 
   build5:
     working_directory: ~/code
@@ -111,21 +114,12 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}1
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}2
-      - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}3
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
       - restore_cache:
           key: app-{{ checksum ".circleci/config.yml" }}
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-          path: app/build/reports
-          destination: reports
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: app/build/test-results
       - run:
           name: Build
           command: ./gradlew assembleRelease
