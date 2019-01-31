@@ -9,11 +9,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-         keys: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-#          - nj-{{ epoch }}
-      - run:
-         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
-         command: sudo chmod +x ./gradlew
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           name: Download Dependencies
           command: ./gradlew androidDependencies
@@ -21,11 +17,6 @@ jobs:
           paths:
             - ~/.gradle
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-       - save_cache:
-          paths:
-            - app
-          key: nj-{{ epoch }}
-      - run:
           name: Run Checkstyle Tests
           command: ./gradlew checkstyle
       - store_artifacts:
