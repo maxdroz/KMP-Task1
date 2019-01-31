@@ -149,7 +149,7 @@ workflows:
             - build
       - apk:
           requires:
-            - build1
+            - build
             - checkstyle
             - pmd
             - lint
