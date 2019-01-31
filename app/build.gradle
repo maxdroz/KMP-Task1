@@ -41,7 +41,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ext.betaDistributionGroupAliases = 'maximdrozdgroup'
-            ext.betaDistributionEmails="ys.minsk.md@yandex.ru, s312@tut.by"
             signingConfig signingConfigs.config
         }
     }
