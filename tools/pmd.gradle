@@ -9,7 +9,7 @@ task pmd(type: Pmd) {
     exclude '**/gen/**'
 
     reports {
-        xml.enabled = false
+        xml.enabled = true
         html.enabled = true
         html.destination = "$project.buildDir/outputs/pmd/pmd.html"
     }
