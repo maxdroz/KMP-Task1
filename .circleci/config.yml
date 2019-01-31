@@ -26,9 +26,9 @@ jobs:
       - store_artifacts:
           path: app/build
           destination: arts
-      - run:
-          name: Run Findbugs
-          command: ./gradlew findbugs
+#      - run:
+#          name: Run Findbugs
+#          command: ./gradlew findbugs
       - run:
           name: Run PMD Tests
           command: ./gradlew pmd
