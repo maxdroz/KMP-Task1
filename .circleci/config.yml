@@ -37,8 +37,6 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
-    parallelism: 4
-    resource_class: large
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -58,8 +56,6 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
-    parallelism: 4
-    resource_class: large
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -79,8 +75,6 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
-    parallelism: 4
-    resource_class: large
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -100,8 +94,6 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
-    parallelism: 4
-    resource_class: large
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
@@ -123,8 +115,6 @@ jobs:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-28-alpha
-    parallelism: 4
-    resource_class: large
     environment:
       JVM_OPTS: -Xmx3200m
     steps:
