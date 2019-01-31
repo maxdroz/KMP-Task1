@@ -28,3 +28,16 @@ jobs:
           destination: reports
       - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: app/build/test-results
+      - run:
+          name: Build
+          command: ./gradlew assembleRelease
+      - store_artifacts:
+          path: app/build/outputs/apk/
+          destination: apks
+      - deploy:
+          name: Deploy APK.
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              bash ./scripts/deploy-hockey.sh
+              bash ./scripts/deploy-fabric.sh
+            fi
