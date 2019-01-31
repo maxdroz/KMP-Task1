@@ -119,7 +119,7 @@ jobs:
               bash ./scripts/deploy-fabric.sh
             fi
 
-workflow:
+workflows:
   version: 2
   build_and_test:
     jobs:
