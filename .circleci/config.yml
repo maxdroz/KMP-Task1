@@ -24,7 +24,7 @@ jobs:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - save_cache:
           paths:
-            - ~/code
+            - ~
           key: app-{{ checksum ".circleci/config.yml" }}
 
 #      - run:
