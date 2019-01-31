@@ -4,7 +4,7 @@ task findbugs(type: FindBugs) {
     description 'Find bugs mainly design flaws, bad practices, multithreaded correctness and code vulnerabilities.'
     group 'verification'
     excludeFilter = file("$project.rootDir/tools/rules-findbugs.xml")
-    classes = fileTree("$project.buildDir/intermediates/javac/debug/compileDebugJavaWithJavac/classes/maxim/drozd/maximdrozd_task1")
+    classes = fileTree("$project.buildDir/intermediates/javac/release/compileReleaseJavaWithJavac/classes/maxim/drozd/maximdrozd_task1")
     source = fileTree('src/main/java')
     effort 'max'
     reportLevel = "high"
