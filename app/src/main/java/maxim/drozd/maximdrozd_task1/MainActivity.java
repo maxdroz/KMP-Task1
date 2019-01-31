@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         String href = getResources().getString(R.string.Link);
         String text = "<a href=\"" + href + "\">" + "Github link to Kamerton12" + "</a>";
         link.setText(Html.fromHtml(text));
+
         link.setMovementMethod(LinkMovementMethod.getInstance());
     }
 }
