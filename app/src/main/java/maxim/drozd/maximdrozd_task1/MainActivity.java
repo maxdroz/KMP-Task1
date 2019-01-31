@@ -3,6 +3,7 @@ package maxim.drozd.maximdrozd_task1;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -11,5 +12,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TextView link = findViewById(R.id.textView2);
+        String href = getResources().getString(R.string.Link);
+        String text = "<a href=\"" + href + "\">" + "Github link to Kamerton12" + "</a>";
+        link.setText(Html.fromHtml(text));
+        link.setMovementMethod(LinkMovementMethod.getInstance());
     }
 }
