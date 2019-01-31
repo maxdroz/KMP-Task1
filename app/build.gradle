@@ -32,8 +32,8 @@ android {
         applicationId "maxim.drozd.maximdrozd_task1"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -41,6 +41,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ext.betaDistributionGroupAliases = 'maximdrozdgroup'
+            ext.betaDistributionEmails="ys.minsk.md@yandex.ru, s312@tut.by"
             signingConfig signingConfigs.config
         }
     }
