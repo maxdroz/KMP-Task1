@@ -19,7 +19,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.gradle
-            - ~
+            - app/build
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
           name: Run Checkstyle Tests
