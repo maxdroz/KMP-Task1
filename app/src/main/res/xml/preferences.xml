@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="@string/common_category_name">
+
+        <SwitchPreference
+            android:key="preference_dark_theme"
+            android:title="@string/dark_theme"
+            android:summary="@string/dark_theme_description"/>
+        <CheckBoxPreference
+            android:key="preference_dense"
+            android:title="@string/dense_layout"
+            android:summary="@string/density_desc"/>
+        <ListPreference
+            android:key="preference_sort"
+            android:entries="@array/sorts"
+            android:defaultValue="0"
+            android:entryValues="@array/sorts_pref"
+            android:dialogTitle="@string/dialog_title"
+            android:title="@string/sort_method"
+            android:summary="@string/sort_pref_desc"/>
+        <CheckBoxPreference
+            android:key="preference_welcome"
+            android:title="@string/welcome_screen"
+            android:summary="@string/welcome_scr_desc"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/launcher_prefs">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="preference_popular"
+            android:summary="@string/popular_area_desc"
+            android:title="@string/popular_area" />
+
+        <SwitchPreference
+            android:key="preference_popular_type"
+            android:title="@string/favourite_area"
+            android:dependency="preference_popular"
+            android:summary="@string/favourite_area_desc"/>
+
+        <EditTextPreference
+            android:defaultValue="2"
+            android:key="preference_popular_height"
+            android:dependency="preference_popular"
+            android:title="@string/popular_area_height"
+            android:inputType="number"
+            android:summary="@string/popular_area_height_desc"/>
+
+
+
+    </PreferenceCategory>
+</PreferenceScreen>
