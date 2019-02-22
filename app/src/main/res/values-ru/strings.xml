@@ -1,0 +1,65 @@
+<resources>
+<string name="app_name">MaxDrozdLauncher</string>
+    <string name="name">Максим Дрозд</string>
+    <string name="text" translatable="false">Github link to Kamerton12</string>
+    <string name="next">Далее</string>
+    <string name="description">Нажмите на иконку, чтобы запустить приложение</string>
+    <string name="welcome">Добро пожаловать в Launcher</string>
+    <string name="dark">Темная тема</string>
+    <string name="light">Светлая тема</string>
+    <string name="default_layout">Макет по умолчанию</string>
+    <string name="dense_layout">Плотный макет</string>
+    <string name="default_desc">Портретный: 4 иконки в строке \nЛандшафтный: 6 иконок в строке</string>
+    <string name="dense_desc">Портретный: 5 значков в ряду \nЛандшафтный: 7 значков в ряду</string>
+    <string name="density_desc">По умолчанию: Портретный: 4 иконки в строке \nЛандшафтный: 6 иконок в строке \nСтена: Портретный: 5 иконок в строке \nЛандшафтный: 7 иконок в строке</string>
+    <string name="finish">Закончить</string>
+    <string name="title_activity_launcher">LauncherActivity</string>
+    <string name="navigation_drawer_open">Открыть навигационную панель</string>
+    <string name="navigation_drawer_close">Закрыть навигационную панель</string>
+    <string name="nav_header_desc">Заголовок навигации</string>
+    <string name="settings">Настройки</string>
+    <string name="linear">Список</string>
+    <string name="grid">Сетка</string>
+    <string name="dark_theme">Темная тема</string>
+    <string-array name="sorts">
+        <item>Без сортировки</item>
+        <item>По дате</item>
+        <item>По алфавиту А-Я</item>
+        <item>По алфавиту Я-A</item>
+        <item>По частоте</item>
+    </string-array>
+    <string-array name="sorts_pref">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string name="dialog_title">Выберите метод сортировки</string>
+    <string name="sort_method">Метод сортировки</string>
+    <string name="welcome_screen">Показать экран приветствия в следующий раз</string>
+    <string name="mobile">Мобильный</string>
+    <string name="home">Домашний</string>
+    <string name="personal">личный</string>
+    <string name="main_email_address">Основной адрес эл. почты</string>
+    <string name="alternate_email_address">Дополнительный адрес эл. почты</string>
+    <string name="work">Работа</string>
+    <string name="dark_theme_description">Показать приложение в темной теме</string>
+    <string name="sort_pref_desc">Способ сортировки: по алфавиту A-Я, по алфавиту Я-A, по дате, по частоте или без сортировки</string>
+    <string name="welcome_scr_desc">Если этот флажок установлен, в следующий раз при загрузке приложения появится экран приветствия.</string>
+    <string name="common_category_name">Общие</string>
+    <string name="launcher">Лаунчер</string>
+    <string name="popular_apps">Популярные приложения</string>
+    <string name="all_apps">Все приложения</string>
+    <string name="launcher_prefs">Настройки лаунчера</string>
+    <string name="favourite_area">Сортировка приложений в области популярных приложений по последнему использованию</string>
+    <string name="popular_area">Включить популярную область</string>
+    <string name="favourite_area_desc">Если включено, приложения в популярной области будут отображаться в порядке последнего запуска, в противном случае по частоте</string>
+    <string name="popular_area_desc">Если включено, будет отображаться область с популярными приложениями</string>
+    <string name="popular_area_height">Высота популярной области</string>
+    <string name="popular_area_height_desc">Высота в иконах популярной области. Максимальное значение: 4</string>
+    <string name="long_press">Удерживайте иконку для вызова контекстного меню</string>
+    <string name="delete_menu">Удалить</string>
+    <string name="frq_menu">Частота</string>
+    <string name="about_menu">О приложении</string>
+</resources>

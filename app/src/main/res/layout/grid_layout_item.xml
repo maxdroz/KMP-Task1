@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/app_selector">
+
+    <maxim.drozd.maximdrozd_task1.SquareImage
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/square_image"
+        android:scaleType="fitCenter"/>
+
+    <TextView
+        android:id="@+id/app_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lines="1"
+        android:ellipsize="end"
+        android:gravity="center"/>
+</LinearLayout>

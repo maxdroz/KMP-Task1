@@ -1,5 +1,65 @@
 <resources>
-    <string name="app_name">MaximDrozd_Task1</string>
-    <string name="Name">Maxim Drozd</string>
-    <string name="Link">https://github.com/Kamerton12</string>
+    <string name="app_name">MaxDrozdLauncher</string>
+    <string name="name">Maxim Drozd</string>
+    <string name="text" translatable="false">Github link to Kamerton12</string>
+    <string name="next">Next</string>
+    <string name="description">Tap on app to launch it</string>
+    <string name="welcome">Welcome to the Launcher app</string>
+    <string name="dark">Dark theme</string>
+    <string name="light">Light theme</string>
+    <string name="default_layout">Default layout</string>
+    <string name="dense_layout">Dense layout</string>
+    <string name="default_desc">Portrait: 4 icons per row \n Landscape: 6 icons per row</string>
+    <string name="dense_desc">Portrait: 5 icons per row \n Landscape: 7 icons per row</string>
+    <string name="density_desc">Default: Portrait: 4 icons per row \n Landscape: 6 icons per row \n Dense: Portrait: 5 icons per row \n Landscape: 7 icons per row</string>
+    <string name="finish">Finish</string>
+    <string name="title_activity_launcher">LauncherActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="settings">Settings</string>
+    <string name="linear">Linear layout</string>
+    <string name="grid">Grid layout</string>
+    <string name="dark_theme">Dark theme</string>
+    <string-array name="sorts">
+        <item>No sort</item>
+        <item>By date</item>
+        <item>By alphabet A-Z</item>
+        <item>By alphabet Z-A</item>
+        <item>By frequency</item>
+    </string-array>
+    <string-array name="sorts_pref">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+    <string name="dialog_title">Select sorting method</string>
+    <string name="sort_method">Sort method</string>
+    <string name="welcome_screen">Show welcome screen next time</string>
+    <string name="mobile">Mobile</string>
+    <string name="home">Home</string>
+    <string name="personal">Personal</string>
+    <string name="main_email_address">Main email address</string>
+    <string name="alternate_email_address">Alternate email address</string>
+    <string name="work">Work</string>
+    <string name="dark_theme_description">Display application in dark theme</string>
+    <string name="sort_pref_desc">Way of sorting: alphabetically A-Z, alphabetically Z-A, by date, by frequency or on sorting at all</string>
+    <string name="welcome_scr_desc">If checked, Welcome screen will appear next time app will be loaded</string>
+    <string name="common_category_name">Common</string>
+    <string name="launcher">Launcher</string>
+    <string name="popular_apps">Popular Apps</string>
+    <string name="all_apps">All Apps</string>
+    <string name="launcher_prefs">Launcher preferences</string>
+    <string name="favourite_area">Sort apps in popular area by last usage</string>
+    <string name="popular_area">Enable Popular area</string>
+    <string name="favourite_area_desc">If enabled, apps in popular area will be shown in order of last execution, otherwise by frequency</string>
+    <string name="popular_area_desc">If enabled, area with popular apps will be shown</string>
+    <string name="popular_area_height">Popular area height</string>
+    <string name="popular_area_height_desc">Height in icons of popular area. Max value : 4</string>
+    <string name="long_press">Long press for context menu to pop up</string>
+    <string name="delete_menu">Delete</string>
+    <string name="frq_menu">Frequency</string>
+    <string name="about_menu">About</string>
 </resources>
