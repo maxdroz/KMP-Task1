@@ -23,6 +23,10 @@ repositories {
 
 
 android {
+    lintOptions {
+        disable 'RtlCompat'
+    }
+
     signingConfigs {
         config {
             keyAlias 'key0'
