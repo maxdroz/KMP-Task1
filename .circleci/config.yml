@@ -152,4 +152,4 @@ workflows:
             - build
             - checkstyle
             - pmd
-            - lint
+#            - lint
