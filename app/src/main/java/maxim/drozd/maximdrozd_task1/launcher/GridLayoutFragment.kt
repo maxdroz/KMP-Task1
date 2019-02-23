@@ -11,6 +11,7 @@ import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.*
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
@@ -79,6 +80,7 @@ class GridLayoutFragment : Fragment() {
 
             if (LauncherActivity.sortMethodChanged) {
                 LauncherActivity.sortMethodChanged = false
+                Log.i("Shad", "sortGrid")
                 LauncherActivity.sort(context)
             }
         }
@@ -102,7 +104,12 @@ class GridLayoutFragment : Fragment() {
             }
         }
 
-        override fun getItemCount(): Int = LauncherActivity.newData!!.size + if (isPopularEnabled) popularHeight * spanCount + 2 else 0
+        override fun getItemCount(): Int {
+
+            Log.i("Shad", "readCount")
+            return LauncherActivity.newData!!.size + if (isPopularEnabled) popularHeight * spanCount + 2 else 0
+        }
+
 
             override fun onBindViewHolder(view: GridViewHolder, position: Int) {
                 when (view.itemViewType) {
@@ -113,7 +120,8 @@ class GridLayoutFragment : Fragment() {
                         if (isPopularEnabled) {
                             val isPopular = position > 0 && position <= popularHeight * spanCount
                             pos = if (isPopular) {
-                                LauncherActivity.popularApps[position - 1]
+                                Log.i("Shad", "read")
+                                LauncherActivity.popularApps!![position - 1]
                             } else
                                 position - popularHeight * spanCount - 2
                         }

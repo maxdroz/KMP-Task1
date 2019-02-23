@@ -87,9 +87,6 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         setContentView(R.layout.activity_launcher)
 
-        setSupportActionBar(main_toolbar)
-
-        main_toolbar_layout.isTitleEnabled = false
 
         Log.i("Shad", "--------------------------------")
 
@@ -99,31 +96,38 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         intentFilter.addDataScheme("package")
         registerReceiver(monitor, intentFilter)
 
-        if (newData == null) {
+        val firstStart = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_welcome", true)
 
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_welcome", true)) {
-                startActivity(Intent(this, WelcomePageActivity::class.java))
-            }
+        if (firstStart && newData == null) {
+            startActivity(Intent(this, WelcomePageActivity::class.java))
+            return
+        }else if (newData == null) {
             nav_view.menu.getItem(0).isChecked = true
             Thread(Runnable {
                 val pmData = this.packageManager.getInstalledApplications(0)
                     .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
 
-                newData = pmData
-                    .map { app -> CustomAppInfo(app, null, null) }
-                    .toMutableList()
+                sort(this)
 
                 runOnUiThread {
-                    if (!tooLate && supportFragmentManager.fragments.size == 0)
+                    if (!tooLate && supportFragmentManager.fragments.size == 0){
+                        Log.i("Shad", "Fragment added")
                         supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
+                    }
                 }
 
                 AppDatabase.getInstance(this).appInfo().updateAllAps(pmData.map { app -> AppInfo(app.packageName) })
             }).start()
-        } else {
-            if (supportFragmentManager.fragments.size == 0)
+        }else{
+            if (supportFragmentManager.fragments.size == 0){
+                Log.i("Shad", "Fragment added")
                 supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
+            }
         }
+
+        setSupportActionBar(main_toolbar)
+
+        main_toolbar_layout.isTitleEnabled = false
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, main_toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -179,6 +183,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
     }
 
     private fun replaceFragment(fr: Fragment) {
+        Log.i("Shad", "replaced")
         val sup = supportFragmentManager.beginTransaction()
         sup.replace(R.id.fragment_launcher, fr)
         sup.commit()
@@ -234,12 +239,21 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         var tooLate = false
         var somethingChanged = false
         var sortMethodChanged = true
-        var popularApps: MutableList<Int> = mutableListOf()
+        var popularApps: MutableList<Int>? = null
         var newData: MutableList<CustomAppInfo>? = null
         class CustomAppInfo(var app: ApplicationInfo, var drawable: Drawable?, var name: String?)
 
         fun sort(context: Context) {
+            Log.i("Shad", "sort!")
+
             val pm = context.packageManager
+            if(newData == null) {
+                newData = pm.getInstalledApplications(0)
+                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+                        .map { app -> CustomAppInfo(app, null, null) }
+                        .toMutableList()
+            }
+
             when (PreferenceManager.getDefaultSharedPreferences(context).getString("preference_sort", "0")) {
                 "1" -> {
                     newData?.sortByDescending { app -> pm.getPackageInfo(app.app.packageName, 0).firstInstallTime }
@@ -273,6 +287,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                         .map { app -> app.second }
                         .toMutableList()
             }
+            Log.i("Shad", popularApps?.size.toString())
         }
     }
 }
