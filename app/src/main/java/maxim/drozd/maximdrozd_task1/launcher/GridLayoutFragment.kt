@@ -116,9 +116,10 @@ class GridLayoutFragment : Fragment() {
                     1 -> view.itemView.findViewById<TextView>(R.id.header).text = view.itemView.context.getString(R.string.popular_apps)
                     2 -> view.itemView.findViewById<TextView>(R.id.header).text = view.itemView.context.getString(R.string.all_apps)
                     else -> {
+                        var isPopular = false
                         var pos = position
                         if (isPopularEnabled) {
-                            val isPopular = position > 0 && position <= popularHeight * spanCount
+                            isPopular = position > 0 && position <= popularHeight * spanCount
                             pos = if (isPopular) {
                                 Log.i("Shad", "read")
                                 LauncherActivity.popularApps!![position - 1]
@@ -141,7 +142,7 @@ class GridLayoutFragment : Fragment() {
                                     view.itemView.findViewById<TextView>(R.id.app_name).text = LauncherActivity.newData!![pos].name
                                     view.itemView.tag = pos
                                     view.itemView.setOnClickListener {
-                                        (fragment.activity as ClickListener).onClick(pos)
+                                        (fragment.activity as ClickListener).onClick(pos, isPopular)
                                     }
                                 }
                             }
@@ -150,7 +151,7 @@ class GridLayoutFragment : Fragment() {
                         view.itemView.findViewById<TextView>(R.id.app_name).text = LauncherActivity.newData!![pos].name
                         view.itemView.findViewById<SquareImage>(R.id.square_image).setImageDrawable(LauncherActivity.newData!![pos].drawable)
                         view.itemView.tag = pos
-                        view.itemView.setOnClickListener { (fragment.activity as ClickListener).onClick(pos) }
+                        view.itemView.setOnClickListener { (fragment.activity as ClickListener).onClick(pos, isPopular) }
                     }
                 }
             }

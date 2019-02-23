@@ -27,9 +27,10 @@ import android.net.Uri
 import android.util.Log
 import android.content.IntentFilter
 import android.support.v7.widget.RecyclerView
+import com.yandex.metrica.YandexMetrica
 
 interface ClickListener {
-    fun onClick(position: Int)
+    fun onClick(position: Int, fromPopular: Boolean)
 }
 
 class LauncherActivity : AppCompatActivity(), ClickListener {
@@ -85,6 +86,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         val themeId = if (dark) R.style.DarkAppThemeNoActionBar else R.style.AppThemeNoActionBar
         setTheme(themeId)
 
+//        throw UnknownError()
+
         setContentView(R.layout.activity_launcher)
 
 
@@ -139,6 +142,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         nav_view.setNavigationItemSelectedListener(::onNavigationItemSelected)
 
         nav_view.getHeaderView(0).findViewById<View>(R.id.imageViewHeader).setOnClickListener {
+            YandexMetrica.reportEvent("Event: Profile opened")
             startActivity(Intent(this, ProfileActivity::class.java))
         }
     }
@@ -164,17 +168,26 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             somethingChanged = false
             recreate()
         }
+        YandexMetrica.resumeSession(this)
+    }
+
+    override fun onPause() {
+        YandexMetrica.pauseSession(this)
+        super.onPause()
     }
 
     private fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.nav_grid -> {
+                YandexMetrica.reportEvent("Event: Grid layout clicked")
                 replaceFragment(GridLayoutFragment())
             }
             R.id.nav_linear -> {
+                YandexMetrica.reportEvent("Event: Linear layout clicked")
                 replaceFragment(ListLayoutFragment())
             }
             R.id.nav_settings -> {
+                YandexMetrica.reportEvent("Event: Settings clicked")
                 startActivity(Intent(this, PreferencesActivity::class.java))
             }
         }
@@ -189,14 +202,15 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         sup.commit()
     }
 
-    override fun onClick(position: Int) {
+    override fun onClick(position: Int, fromPopular: Boolean) {
         Thread(Runnable {
             AppDatabase.getInstance(this).appInfo().updateLaunch(newData!![position].app.packageName, System.currentTimeMillis())
-
             sort(this)
             runOnUiThread {
                 notifyDataSet()
             }
+            val json = """{"fromPopular":"$fromPopular"}"""
+            YandexMetrica.reportEvent("Event: App launched", json)
         }).start()
         startActivity(Intent(packageManager.getLaunchIntentForPackage(newData!![position].app.packageName)))
     }
@@ -215,11 +229,13 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         val packageUri = Uri.parse(pn)
         when (item.order) {
             0 -> {
+                YandexMetrica.reportEvent("Event: App uninstalled")
                 val uninstallIntent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri)
                 startActivity(uninstallIntent)
             }
 
             2 -> {
+                YandexMetrica.reportEvent("Event: App info opened")
                 val aboutIntent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
                 startActivity(aboutIntent)
             }

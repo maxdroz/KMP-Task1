@@ -78,9 +78,10 @@ class ListLayoutFragment : Fragment() {
                 1 -> view.itemView.findViewById<TextView>(R.id.header).text = view.itemView.context.getString(R.string.popular_apps)
                 2 -> view.itemView.findViewById<TextView>(R.id.header).text = view.itemView.context.getString(R.string.all_apps)
              else -> {
+                 var isPopular = false
                  var pos = position
                  if (isPopularEnabled) {
-                     val isPopular = position in 1..popularHeight
+                     isPopular = position in 1..popularHeight
                      // TODO Добавить различные варианты выборки популярного приложения
                      pos = if (isPopular)
                          arrayOf(1, 5, 2, 7, 4, 8, 3, 9, 0, 3, 1, 5, 2, 7, 4, 8, 3, 9, 0, 3)[position - 1]
@@ -103,7 +104,7 @@ class ListLayoutFragment : Fragment() {
                              view.itemView.findViewById<TextView>(R.id.app_name).text = LauncherActivity.newData!![pos].name
                              view.itemView.tag = pos
                              view.itemView.setOnClickListener {
-                                 (fragment.activity as ClickListener).onClick(pos)
+                                 (fragment.activity as ClickListener).onClick(pos, isPopular)
                              }
                          }
                      }
@@ -112,7 +113,7 @@ class ListLayoutFragment : Fragment() {
                  view.itemView.findViewById<TextView>(R.id.app_name).text = LauncherActivity.newData!![pos].name
                  view.itemView.findViewById<ImageView>(R.id.square_image).setImageDrawable(LauncherActivity.newData!![pos].drawable)
                  view.itemView.tag = pos
-                 view.itemView.setOnClickListener { (fragment.activity as ClickListener).onClick(pos) }
+                 view.itemView.setOnClickListener { (fragment.activity as ClickListener).onClick(pos, isPopular) }
              }
             }
         }
