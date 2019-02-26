@@ -8,12 +8,19 @@
     tools:context=".launcher.LauncherActivity"
     tools:showIn="@layout/app_bar_launcher">
 
-    <FrameLayout
-        android:id="@+id/fragment_launcher"
+    <!--<FrameLayout-->
+        <!--android:id="@+id/fragment_launcher"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+
+    <!--</FrameLayout>-->
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/launcher_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </FrameLayout>
+    </android.support.v4.view.ViewPager>
 
     <!--<fragment-->
         <!--android:id="@+id/fragment_launcher"-->

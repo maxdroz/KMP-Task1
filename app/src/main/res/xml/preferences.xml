@@ -47,8 +47,13 @@
             android:title="@string/popular_area_height"
             android:inputType="number"
             android:summary="@string/popular_area_height_desc"/>
-
-
-
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/background">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="preference_background_diff"
+            android:title="@string/pref_background"
+            android:summary="@string/pref_background_decs"/>
     </PreferenceCategory>
 </PreferenceScreen>

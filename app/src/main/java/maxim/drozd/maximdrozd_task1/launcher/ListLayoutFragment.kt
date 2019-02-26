@@ -82,9 +82,8 @@ class ListLayoutFragment : Fragment() {
                  var pos = position
                  if (isPopularEnabled) {
                      isPopular = position in 1..popularHeight
-                     // TODO Добавить различные варианты выборки популярного приложения
                      pos = if (isPopular)
-                         arrayOf(1, 5, 2, 7, 4, 8, 3, 9, 0, 3, 1, 5, 2, 7, 4, 8, 3, 9, 0, 3)[position - 1]
+                         LauncherActivity.popularApps!![position - 1]
                      else
                          position - popularHeight - 2
                  }

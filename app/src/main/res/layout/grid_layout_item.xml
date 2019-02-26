@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:background="@drawable/app_selector">
 
@@ -12,11 +12,23 @@
         android:id="@+id/square_image"
         android:scaleType="fitCenter"/>
 
-    <TextView
+    <!--<TextView-->
+        <!--android:id="@+id/app_name"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:lines="1"-->
+        <!--android:ellipsize="end"-->
+        <!--android:gravity="center"/>-->
+
+
+    <com.iambedant.text.OutlineTextView
         android:id="@+id/app_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:lines="1"
         android:ellipsize="end"
-        android:gravity="center"/>
+        android:gravity="center"
+        app:outlineColor="#888"
+        app:outlineWidth="0.1"/>
+
 </LinearLayout>

@@ -38,7 +38,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "maxim.drozd.maximdrozd_task1"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 7
         versionName "2.0"
@@ -54,6 +54,11 @@ android {
     }
 }
 
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -85,4 +90,5 @@ dependencies {
     // Опционально. Библиотека Play Install Referrer.
     implementation 'com.android.installreferrer:installreferrer:1.0'
 
+    implementation 'com.github.iamBedant:OutlineTextView:1.0.5'
 }

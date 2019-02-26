@@ -3,9 +3,11 @@ package maxim.drozd.maximdrozd_task1.DB
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
+import android.arch.persistence.room.TypeConverters
 import android.content.Context
 
-@Database(entities = [AppInfo::class], version = 1)
+@Database(entities = [AppInfo::class, DesktopAppInfo::class], version = 1)
+@TypeConverters(PositionConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     companion object {
         private var APPDATABASE: AppDatabase? = null
@@ -22,5 +24,6 @@ abstract class AppDatabase : RoomDatabase() {
             return APPDATABASE!!
         }
     }
-    public abstract fun appInfo(): AppInfoDAO
+    abstract fun appInfo(): AppInfoDAO
+    abstract fun desktopAppInfo(): DesktopAppInfoDAO
 }

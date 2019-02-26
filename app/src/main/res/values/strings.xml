@@ -62,4 +62,7 @@
     <string name="delete_menu">Delete</string>
     <string name="frq_menu">Frequency</string>
     <string name="about_menu">About</string>
+    <string name="background">Background</string>
+    <string name="pref_background_decs">If switched On, backgrounds of different screens are different</string>
+    <string name="pref_background">Different backgrounds</string>
 </resources>
