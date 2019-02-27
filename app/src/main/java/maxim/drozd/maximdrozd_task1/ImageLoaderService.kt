@@ -31,14 +31,17 @@ class ImageLoaderService: JobService() {
             val sp = PreferenceManager.getDefaultSharedPreferences(this)
 
             var path = sp.getString("file1_path", "")
+            Log.i("Shad", "$path 1")
             if(path != "")
                 File(path).delete()
 
             path = sp.getString("file2_path", "")
+            Log.i("Shad", "$path 2")
             if(path != "")
                 File(path).delete()
 
             path = sp.getString("file3_path", "")
+            Log.i("Shad", "$path 3")
             if(path != "")
                 File(path).delete()
 
@@ -77,6 +80,7 @@ class ImageLoaderService: JobService() {
         fun loadBitmap(srcUrl: String): Bitmap? {
             try {
                 val url = URL(srcUrl)
+                Log.i("Shad", "load: $url")
                 val urlConnection = url.openConnection()
                 val inputStream = urlConnection.getInputStream()
                 val buffer = ByteArrayOutputStream()

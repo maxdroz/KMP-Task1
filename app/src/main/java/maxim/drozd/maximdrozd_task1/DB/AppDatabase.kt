@@ -1,9 +1,11 @@
 package maxim.drozd.maximdrozd_task1.DB
 
+import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.TypeConverters
+import android.arch.persistence.room.migration.Migration
 import android.content.Context
 
 @Database(entities = [AppInfo::class, DesktopAppInfo::class], version = 1)
@@ -18,6 +20,7 @@ abstract class AppDatabase : RoomDatabase() {
                     APPDATABASE = Room
                             .databaseBuilder(context.applicationContext, AppDatabase::class.java, "main.db")
                             .allowMainThreadQueries()
+                            .fallbackToDestructiveMigration()
                             .build()
                 }
             }

@@ -42,8 +42,6 @@
                 android:value=".launcher.LauncherActivity" />
         </activity>
 
-        <activity android:name=".TempViewTable"/>
-
         <service android:name=".ImageLoaderService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 

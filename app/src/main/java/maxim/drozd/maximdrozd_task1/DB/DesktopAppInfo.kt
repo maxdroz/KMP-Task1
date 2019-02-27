@@ -18,6 +18,8 @@ data class DesktopAppInfo(
         var value: String,
         var text: String
 ){
+
+    var a:Int = 2
     var used = false
     var imagePath: String = ""
 }

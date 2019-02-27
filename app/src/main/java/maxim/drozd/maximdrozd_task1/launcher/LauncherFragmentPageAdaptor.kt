@@ -10,12 +10,16 @@ class LauncherFragmentPageAdaptor(fm: FragmentManager?) : FragmentPagerAdapter(f
             0 -> ListLayoutFragment()
             1 -> GridLayoutFragment()
             else -> DesktopFragment()
+
         }
     }
 
-    fun makeFragmentName(viewPagerId: Int, index: Int): String {
-        return "android:switcher:$viewPagerId:$index"
+    companion object {
+        fun makeFragmentName(viewPagerId: Int, index: Int): String {
+            return "android:switcher:$viewPagerId:$index"
+        }
     }
+
 
     override fun getCount(): Int = 3
 }

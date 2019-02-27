@@ -35,6 +35,10 @@
         <item>3</item>
         <item>4</item>
     </string-array>
+    <string-array name="icons">
+        <item>URL</item>
+        <item>Contact</item>
+    </string-array>
     <string name="dialog_title">Select sorting method</string>
     <string name="sort_method">Sort method</string>
     <string name="welcome_screen">Show welcome screen next time</string>
@@ -65,4 +69,14 @@
     <string name="background">Background</string>
     <string name="pref_background_decs">If switched On, backgrounds of different screens are different</string>
     <string name="pref_background">Different backgrounds</string>
+    <string name="add_to_dsk_menu">Add to Desktop</string>
+    <string name="no_space_desktop">No space for new icons on Desktop</string>
+    <string name="yes">Yes</string>
+    <string name="delete_icon">Delete Icon?</string>
+    <string name="link_name">Name for a link:</string>
+    <string name="web_address">Web address:</string>
+    <string name="done">Done</string>
+    <string name="icon_type">Select icon type</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

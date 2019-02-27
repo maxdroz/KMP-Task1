@@ -2,6 +2,7 @@ package maxim.drozd.maximdrozd_task1.DB
 
 import android.arch.persistence.room.*
 import android.arch.persistence.room.OnConflictStrategy.REPLACE
+import android.graphics.PostProcessor
 
 @Dao
 interface DesktopAppInfoDAO{
@@ -13,6 +14,8 @@ interface DesktopAppInfoDAO{
         resetUsed()
     }
 
+    @Query("DELETE FROM desktop WHERE pos = :pos")
+    fun deletePos(pos: Position)
 
     @Query("UPDATE desktop SET used = 1 WHERE type = 1 AND value IN (:packageNames)")
     fun updateUsed(packageNames: List<String>)
@@ -31,4 +34,15 @@ interface DesktopAppInfoDAO{
 
     @Insert(onConflict = REPLACE)
     fun insertAll(vararg infos: DesktopAppInfo)
+
+    @Query("SELECT pos FROM desktop")
+    fun getAllTakenPositions(): List<Position>
+
+    @Transaction
+    fun migrate(prev: Position, to: Position){
+        val data = getAppByPos(prev)
+        data!!.pos = to
+        insertAll(data)
+        deletePos(prev)
+    }
 }

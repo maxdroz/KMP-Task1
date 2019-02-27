@@ -15,8 +15,8 @@ class SquareImage @JvmOverloads constructor(
         if (d != null) {
             val w = View.MeasureSpec.getSize(widthMeasureSpec)
             val h = w * d.intrinsicHeight / d.intrinsicWidth
-            setMeasuredDimension(w, h)
+            setMeasuredDimension(w, w)
         } else
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+            super.onMeasure(widthMeasureSpec, widthMeasureSpec)
     }
 }

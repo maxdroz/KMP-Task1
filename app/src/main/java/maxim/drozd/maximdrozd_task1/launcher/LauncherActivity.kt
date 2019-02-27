@@ -1,9 +1,11 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
+import android.app.Activity
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.*
 import android.content.pm.ApplicationInfo
+import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -22,11 +24,19 @@ import maxim.drozd.maximdrozd_task1.welcome_pages.WelcomePageActivity
 import android.view.ContextMenu
 import android.view.Menu
 import android.net.Uri
+import android.provider.ContactsContract
+import android.support.design.widget.AppBarLayout
+import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.Snackbar
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.support.v7.widget.RecyclerView
+import android.widget.Toast
 import com.yandex.metrica.YandexMetrica
 import kotlinx.android.synthetic.main.content_launcher.*
 import maxim.drozd.maximdrozd_task1.*
+import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
+import maxim.drozd.maximdrozd_task1.DB.Position
 
 interface ClickListener {
     fun onClick(position: Int, fromPopular: Boolean)
@@ -81,10 +91,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
                 Log.i("Shad", "after: ${newData?.size}")
                 Log.i("Shad", action + this@LauncherActivity.supportFragmentManager.fragments.size)
-                if (this@LauncherActivity.supportFragmentManager.fragments.size > 0) {
-                    this@LauncherActivity.runOnUiThread {
-                        notifyDataSet()
-                    }
+               this@LauncherActivity.runOnUiThread {
+                    notifyDataSet()
                 }
             }).start()
         }
@@ -92,14 +100,14 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
     private fun notifyDataSet() {
         supportFragmentManager
-                .findFragmentByTag((launcher_view_pager.adapter as LauncherFragmentPageAdaptor).makeFragmentName(launcher_view_pager.id, 1))
+                .findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(launcher_view_pager.id, 1))
                 ?.view
                 ?.findViewById<RecyclerView>(R.id.grid_recycler)
                 ?.adapter
                 ?.notifyDataSetChanged()
 
         supportFragmentManager
-                .findFragmentByTag((launcher_view_pager.adapter as LauncherFragmentPageAdaptor).makeFragmentName(launcher_view_pager.id, 0))
+                .findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(launcher_view_pager.id, 0))
                 ?.view
                 ?.findViewById<RecyclerView>(R.id.list_recycler)
                 ?.adapter
@@ -121,7 +129,31 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         launcher_view_pager.adapter = LauncherFragmentPageAdaptor(supportFragmentManager)
         launcher_view_pager.currentItem = 1
+        launcher_view_pager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener{
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
 
+            override fun onPageSelected(position: Int) {
+                if(position == 2){
+                    app_bar_layout.visibility = View.INVISIBLE
+                    val params = behaviour.layoutParams as CoordinatorLayout.LayoutParams
+                    params.behavior = null
+                    behaviour.requestLayout()
+                }
+
+                else{
+                    app_bar_layout.visibility = View.VISIBLE
+                    val params = behaviour.layoutParams as CoordinatorLayout.LayoutParams
+                    params.behavior = AppBarLayout.ScrollingViewBehavior()
+                    behaviour.requestLayout()
+                }
+
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+            }
+
+        })
         val intervalMillis = 5000L //TODO
 
         val jober = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
@@ -310,6 +342,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         val count = AppDatabase.getInstance(this).appInfo().getTimesLaunchedApp(newData!![v!!.tag as Int].app.packageName)[0]
         menu?.add(v.tag as Int, Menu.NONE, 1, getString(R.string.frq_menu) + ": $count")
         menu?.add(v.tag as Int, Menu.NONE, 2, getString(R.string.about_menu))
+        menu?.add(v.tag as Int, Menu.NONE, 3, getString(R.string.add_to_dsk_menu))
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -326,6 +359,36 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                 YandexMetrica.reportEvent("Event: App info opened")
                 val aboutIntent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
                 startActivity(aboutIntent)
+            }
+
+            3 -> {
+                YandexMetrica.reportEvent("Event: App added to Desktop")
+                Thread(Runnable {
+                    val positions = AppDatabase.getInstance(this).desktopAppInfo().getAllTakenPositions()
+                    val fragm = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(launcher_view_pager.id, 2)) as DesktopFragment
+                    val h = fragm.height
+                    val w = fragm.width
+                    var ah = -1
+                    var aw = -1
+                    outer@ for(i in 0 until h){
+                        for(j in 0 until w){
+                            if(Position(i, j) !in positions){
+                                ah = i
+                                aw = j
+                                break@outer
+                            }
+                        }
+                    }
+                    if(ah == -1 || aw == -1){
+                        Log.i("Shad", "no space")
+                        Snackbar.make(launcher_view_pager, getString(R.string.no_space_desktop), Snackbar.LENGTH_SHORT).show()
+                        return@Runnable
+                    }
+                    val name: String = newData!![item.groupId].name!!
+                    val packageName: String = newData!![item.groupId].app.packageName
+                    AppDatabase.getInstance(this).desktopAppInfo().insertAll(DesktopAppInfo(Position(ah, aw),1, packageName, name))
+                    fragm.update()
+                }).start()
             }
 
             else -> {
@@ -349,6 +412,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         const val UPDATE_BACKGROUND = "maxim.drozd.maximdrozd_task1.upadte_backgeround"
 
+        @Synchronized
         fun sort(context: Context) {
             Log.i("Shad", "sort!")
 
@@ -397,6 +461,25 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                         .toMutableList()
             }
             Log.i("Shad", popularApps?.size.toString())
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        Log.i("Shad", "AWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW1$requestCode $resultCode")
+        if(requestCode == 100 && resultCode == Activity.RESULT_OK){
+            val contactUri = data?.data
+            val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val cursor = this.contentResolver.query(contactUri!!, projection,
+                    null, null, null)
+
+            if (cursor != null && cursor.moveToFirst()) {
+                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+                val number = cursor.getString(numberIndex)
+                Log.i("Shad", "AWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW$number")
+            }
+            cursor?.close()
+
         }
     }
 }
