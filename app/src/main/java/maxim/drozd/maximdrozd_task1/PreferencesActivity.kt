@@ -1,7 +1,12 @@
 package maxim.drozd.maximdrozd_task1
 
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
+import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import com.takisoft.fix.support.v7.preference.PreferenceFragmentCompat
@@ -83,6 +88,23 @@ class PreferencesFragment : PreferenceFragmentCompat() {
                     val value = sharedPreferences.getString("preference_popular_height", "2")!!.toInt()
                     val json = """{"value":"$value"}"""
                     YandexMetrica.reportEvent("Event: Popular's height changed", json)
+                }
+                "preference_background_freq" -> {
+                    val (offset, period) = LauncherActivity.getTimeOffsetAndPeriod(context!!)
+
+                    val bundle = PersistableBundle()
+                    bundle.putLong("offset", offset)
+                    bundle.putLong("period", period)
+
+                    val jobber = context!!.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+
+                    jobber.cancelAll()
+
+                    jobber.schedule(JobInfo.Builder(0,
+                            ComponentName(context!!.applicationContext, JobOffsetService::class.java))
+                            .setOverrideDeadline(0L)
+                            .setExtras(bundle)
+                            .build())
                 }
             }
         }).start()

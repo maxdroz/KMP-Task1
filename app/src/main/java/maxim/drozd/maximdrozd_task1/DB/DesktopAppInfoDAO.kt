@@ -41,8 +41,10 @@ interface DesktopAppInfoDAO{
     @Transaction
     fun migrate(prev: Position, to: Position){
         val data = getAppByPos(prev)
-        data!!.pos = to
-        insertAll(data)
-        deletePos(prev)
+        if(data != null){
+            data.pos = to
+            insertAll(data)
+            deletePos(prev)
+        }
     }
 }

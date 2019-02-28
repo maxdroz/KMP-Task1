@@ -1,6 +1,8 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
 import android.app.Activity
+import android.content.ContentUris
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -26,6 +28,7 @@ import maxim.drozd.maximdrozd_task1.DB.Position
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.lang.Exception
 import java.lang.StringBuilder
 import java.net.URI
 import java.net.URL
@@ -38,15 +41,13 @@ class DesktopFragment: Fragment(){
     val height = 5
     val width = 4
 
+    var contactPos: Position? = null
+
     var active: Position? = null
     var activeView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.desktop, container, false)
-    }
-
-    fun findClosest(x: Float, y: Float): Position{
-        return Position(0, 0)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -124,8 +125,7 @@ class DesktopFragment: Fragment(){
         view.setOnClickListener {
             if(active != null){
                 active = null
-//                activeView?.setBackgroundColor(Color.TRANSPARENT)
-                activeView?.background = null
+                activeView?.setBackgroundResource(R.drawable.app_selector)
                 activeView = null
                 return@setOnClickListener
             }
@@ -136,10 +136,17 @@ class DesktopFragment: Fragment(){
                     startActivity(site)
                 }
                 1 -> {
-                    startActivity(context!!.packageManager.getLaunchIntentForPackage(info.value))
+                    try {
+                        startActivity(context!!.packageManager.getLaunchIntentForPackage(info.value))
+                    }
+                    catch (e: Exception){
+                        Snackbar.make(view, getString(R.string.unable_to_start), Snackbar.LENGTH_SHORT).show()
+                    }
                 }
                 else -> {
-                    //TODO
+                    val number = Uri.parse("tel:${info.value}")
+                    val dial = Intent(Intent.ACTION_CALL, number)
+                    startActivity(dial)
                 }
             }
         }
@@ -148,10 +155,10 @@ class DesktopFragment: Fragment(){
 
 
     private fun bindEmpty(view: View, h: Int, w: Int){
+        view.setBackgroundResource(R.drawable.app_selector)
         view.setOnClickListener {
             if(active != null){
-
-                activeView?.background = null
+                activeView?.setBackgroundResource(R.drawable.app_selector)
                 activeView = null
                 Thread(Runnable {
                     AppDatabase.getInstance(context!!).desktopAppInfo().migrate(active!!, Position(h, w))
@@ -161,6 +168,7 @@ class DesktopFragment: Fragment(){
             }
         }
         view.setOnLongClickListener {
+            contactPos = Position(h, w)
             val df = DialogFragmentMain.create(h, w)
             df.show(fragmentManager, "dialog_choose")
             return@setOnLongClickListener true
@@ -213,8 +221,7 @@ class DesktopFragment: Fragment(){
                     (context!!.packageManager.getApplicationIcon(info.value)as BitmapDrawable).bitmap
                 }
                 else -> {
-                    //TODO
-                    Bitmap.createBitmap(1,1, Bitmap.Config.ARGB_8888)
+                    BitmapFactory.decodeResource(resources, R.drawable.default_contact_icon)
                 }
             }
             val f = File.createTempFile("icon", ".png")
@@ -227,7 +234,16 @@ class DesktopFragment: Fragment(){
         return img
     }
 
+    fun getContactInfo(name: String, data: String){
+        Log.i("Shad", "${contactPos?.h} ${contactPos?.w}")
+       if(contactPos != null){
+           AppDatabase.getInstance(context!!).desktopAppInfo().insertAll(DesktopAppInfo(contactPos!!, 2, data, name))
+           update()
+        }
+    }
+
     fun update(){
+        table ?: return
         for(i in 0 until height * 2 - 1){
             val row = table.getChildAt(i) as? LinearLayout
             row ?: continue
@@ -235,12 +251,13 @@ class DesktopFragment: Fragment(){
                 val v =  row.getChildAt(j)
                 val image = v.findViewById<SquareImage>(R.id.square_image)
                 val text = v.findViewById<TextView>(R.id.app_name)
-//
                 val desktopAppInfo = AppDatabase.getInstance(context!!).desktopAppInfo().getAppByPos(Position(i / 2, j))
 
                 if(desktopAppInfo != null) {
                     val bmp = getImage(desktopAppInfo)
                     Handler(Looper.getMainLooper()).post {
+                        if(v != activeView)
+                            v.setBackgroundResource(R.drawable.app_selector)
                         image.visibility = View.VISIBLE
                         image.setImageBitmap(bmp)
                         text.text = desktopAppInfo.text

@@ -21,24 +21,6 @@
     <string name="linear">Linear layout</string>
     <string name="grid">Grid layout</string>
     <string name="dark_theme">Dark theme</string>
-    <string-array name="sorts">
-        <item>No sort</item>
-        <item>By date</item>
-        <item>By alphabet A-Z</item>
-        <item>By alphabet Z-A</item>
-        <item>By frequency</item>
-    </string-array>
-    <string-array name="sorts_pref">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-    </string-array>
-    <string-array name="icons">
-        <item>URL</item>
-        <item>Contact</item>
-    </string-array>
     <string name="dialog_title">Select sorting method</string>
     <string name="sort_method">Sort method</string>
     <string name="welcome_screen">Show welcome screen next time</string>
@@ -79,4 +61,63 @@
     <string name="icon_type">Select icon type</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="desktop">Desktop</string>
+    <string name="unable_to_start">Unable to start application</string>
+    <string name="source_site">Source site</string>
+    <string name="bkg_img_source">Background images source</string>
+    <string name="bkg_img_source_desc">Random images from selected sources will appear on the background of launcher</string>
+    <string name="bkg_frq_dt">Update background image per...</string>
+    <string name="bkg_frq">Background image change frequency</string>
+    <string name="bkg_frq_desk">Defines frequency of changing background image</string>
+    <string name="upd_bkg_now">Update background image now</string>
+
+    <string-array name="sorts">
+        <item>No sort</item>
+        <item>By date</item>
+        <item>By alphabet A-Z</item>
+        <item>By alphabet Z-A</item>
+        <item>By frequency</item>
+    </string-array>
+
+    <string-array name="sources">
+        <item>loremflickr</item>
+        <item>picsum</item>
+        <item>thecatapi</item>
+        <item>unsplash</item>
+    </string-array>
+
+    <string-array name="sources_val">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="timings">
+        <item>15 minuets</item>
+        <item>1 hour</item>
+        <item>8 hours</item>
+        <item>24 hours</item>
+    </string-array>
+
+    <string-array name="timings_val">
+        <item>900000</item>
+        <item>3600000</item>
+        <item>28800000</item>
+        <item>86400000</item>
+    </string-array>
+
+    <string-array name="sorts_pref">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="icons">
+        <item>URL</item>
+        <item>Contact</item>
+    </string-array>
+
 </resources>

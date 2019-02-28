@@ -5,7 +5,6 @@ import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.*
 import android.content.pm.ApplicationInfo
-import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
@@ -24,6 +23,7 @@ import maxim.drozd.maximdrozd_task1.welcome_pages.WelcomePageActivity
 import android.view.ContextMenu
 import android.view.Menu
 import android.net.Uri
+import android.os.PersistableBundle
 import android.provider.ContactsContract
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
@@ -31,15 +31,16 @@ import android.support.design.widget.Snackbar
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.support.v7.widget.RecyclerView
-import android.widget.Toast
 import com.yandex.metrica.YandexMetrica
 import kotlinx.android.synthetic.main.content_launcher.*
 import maxim.drozd.maximdrozd_task1.*
 import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
 import maxim.drozd.maximdrozd_task1.DB.Position
+import java.lang.Exception
+import java.util.*
 
 interface ClickListener {
-    fun onClick(position: Int, fromPopular: Boolean)
+    fun onClick(position: Int, fromPopular: Boolean, view: View)
 }
 
 class LauncherActivity : AppCompatActivity(), ClickListener {
@@ -47,20 +48,28 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
     private val backgroundMonitor = object : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
             val action = intent?.action
-            if(action == UPDATE_BACKGROUND){
-                Log.i("Shad", "inBroadcastReciever")
-                val sp = PreferenceManager.getDefaultSharedPreferences(context)
-//                if(supportFragmentManager.findFragmentById(R.id.fragment_launcher) != null){
-//                    val key = when(supportFragmentManager.findFragmentById(R.id.fragment_launcher)!!::class.java){
-//                        GridLayoutFragment::class.java -> sp.getString("file1_path", "")
-//                        ListLayoutFragment::class.java -> sp.getString("file2_path", "")
-//                        else -> sp.getString("file3_path", "")
-//                    }
-//                    if(key != ""){
-//                        val bmp = BitmapFactory.decodeFile(key)
-//                        this@LauncherActivity.drawer_layout.background = BitmapDrawable(resources, bmp)
-//                    }
-//                }
+            when(action){
+                UPDATE_BACKGROUND -> {
+                    Log.i("ShadJobs", "inBroadcastReciever")
+                    val sp = PreferenceManager.getDefaultSharedPreferences(context)
+                    val key = when (launcher_view_pager.currentItem) {
+                        0 -> sp.getString("file1_path", "")
+                        1 -> sp.getString("file2_path", "")
+                        else -> sp.getString("file3_path", "")
+                    }
+                    if (key != "") {
+                        val bmp = BitmapFactory.decodeFile(key)
+                        this@LauncherActivity.drawer_layout.background = BitmapDrawable(resources, bmp)
+                    }
+                }
+                UPDATE_BACKGROUND_ONCE -> {
+                    Log.i("ShadJobs", "inBroadcastRecieverOnce")
+                    val jobber = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+                    jobber.schedule(JobInfo.Builder(2,
+                            ComponentName(applicationContext, ImageLoaderService::class.java))
+                            .setOverrideDeadline(0L)
+                            .build())
+                }
             }
         }
     }
@@ -125,8 +134,6 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         Log.i("Shad", "--------------------------------")
 
-//        startActivity(Intent(this, TempViewTable::class.java))
-
         launcher_view_pager.adapter = LauncherFragmentPageAdaptor(supportFragmentManager)
         launcher_view_pager.currentItem = 1
         launcher_view_pager.addOnPageChangeListener(object: ViewPager.OnPageChangeListener{
@@ -134,18 +141,24 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             }
 
             override fun onPageSelected(position: Int) {
+                nav_view.menu.getItem(2 - position).isChecked = true
                 if(position == 2){
                     app_bar_layout.visibility = View.INVISIBLE
                     val params = behaviour.layoutParams as CoordinatorLayout.LayoutParams
                     params.behavior = null
                     behaviour.requestLayout()
                 }
-
                 else{
                     app_bar_layout.visibility = View.VISIBLE
                     val params = behaviour.layoutParams as CoordinatorLayout.LayoutParams
                     params.behavior = AppBarLayout.ScrollingViewBehavior()
                     behaviour.requestLayout()
+                    val fragm = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(launcher_view_pager.id, 2)) as DesktopFragment
+                    if(fragm.active != null){
+                        fragm.active = null
+                        fragm.activeView = null
+                        fragm.update()
+                    }
                 }
 
             }
@@ -154,14 +167,20 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             }
 
         })
-        val intervalMillis = 5000L //TODO
 
-        val jober = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jober.schedule(JobInfo.Builder(0,
-                ComponentName(applicationContext, ImageLoaderService::class.java))
+        val (offset, period) = getTimeOffsetAndPeriod(this)
+
+        val bundle = PersistableBundle()
+        bundle.putLong("offset", offset)
+        bundle.putLong("period", period)
+
+        val jobber = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        jobber.schedule(JobInfo.Builder(0,
+                ComponentName(applicationContext, JobOffsetService::class.java))
                 .setOverrideDeadline(0L)
-//                .setPeriodic(intervalMillis)
+                .setExtras(bundle)
                 .build())
+//        jobber.
 
         val firstStart = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_welcome", true)
 
@@ -172,22 +191,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             nav_view.menu.getItem(0).isChecked = true
             Thread(Runnable {
                 sort(this)
-//
-//                runOnUiThread {
-//                    if (!tooLate && supportFragmentManager.fragments.size == 0){
-//                        Log.i("Shad", "Fragment added")
-//                        supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
-//                    }
-//                }
             }).start()
         }
-//        else{
-//            if (supportFragmentManager.fragments.size == 0){
-//                Log.i("Shad", "Fragment added")
-////                supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
-//                supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, DesktopFragment()).commit()
-//            }
-//        }
 
         val path = PreferenceManager.getDefaultSharedPreferences(this).getString("file1_path", "")
         if(path != ""){
@@ -229,7 +234,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
     override fun onStart() {
         super.onStart()
 
-        var intentFilter2 = IntentFilter()
+        var intentFilter2 = IntentFilter(UPDATE_BACKGROUND_ONCE)
         intentFilter2.addAction(UPDATE_BACKGROUND)
         registerReceiver(backgroundMonitor, intentFilter2)
 
@@ -243,16 +248,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
     override fun onResume() {
         super.onResume()
         YandexMetrica.resumeSession(this)
-//        if (supportFragmentManager?.findFragmentById(R.id.fragment_launcher) != null) {
-//            if (supportFragmentManager.findFragmentById(R.id.fragment_launcher)!!::class.java == GridLayoutFragment::class.java)
-//                nav_view.menu.getItem(0).isChecked = true
-//            else
-//                nav_view.menu.getItem(1).isChecked = true
-//        }
 
-
-
-//        TODO nav_view.menu.getItem(launcher_view_pager.currentItem).isChecked = true
+        nav_view.menu.getItem(launcher_view_pager.currentItem).isChecked = true
 
         if (somethingChanged) {
             somethingChanged = false
@@ -284,7 +281,6 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                         }
                     }
                 }).start()
-//                replaceFragment(GridLayoutFragment())
                 launcher_view_pager.currentItem = 1
             }
             R.id.nav_linear -> {
@@ -300,10 +296,11 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                     }
                 }).start()
                 launcher_view_pager.currentItem = 0
-//                replaceFragment(ListLayoutFragment())
             }
-            //TODO
-            //this.drawer_layout.background = BitmapDrawable(resources, Cache.getInstance().get(CACHE_3))
+            R.id.nav_desktop ->{
+                YandexMetrica.reportEvent("Event: Desktop clicked")
+                launcher_view_pager.currentItem = 2
+            }
             R.id.nav_settings -> {
                 YandexMetrica.reportEvent("Event: Settings clicked")
                 startActivity(Intent(this, PreferencesActivity::class.java))
@@ -312,27 +309,23 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
-//
-//    private fun replaceFragment(fr: Fragment) {
-//        Log.i("Shad", "replaced")
-//        val sup = supportFragmentManager.beginTransaction()
-//        sup.replace(R.id.fragment_launcher, fr)
-//        sup.commit()
-//    }
 
-    override fun onClick(position: Int, fromPopular: Boolean) {
+    override fun onClick(position: Int, fromPopular: Boolean, view: View) {
         Thread(Runnable {
             AppDatabase.getInstance(this).appInfo().updateLaunch(newData!![position].app.packageName, System.currentTimeMillis())
             sort(this)
             runOnUiThread {
                 notifyDataSet()
-//                launcher_view_pager.adapter?.notifyDataSetChanged()
-
             }
             val json = """{"fromPopular":"$fromPopular"}"""
             YandexMetrica.reportEvent("Event: App launched", json)
         }).start()
-        startActivity(Intent(packageManager.getLaunchIntentForPackage(newData!![position].app.packageName)))
+        try {
+            startActivity(Intent(packageManager.getLaunchIntentForPackage(newData!![position].app.packageName)))
+        }
+        catch (e: Exception){
+            Snackbar.make(view, getString(R.string.unable_to_start), Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
@@ -351,7 +344,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         when (item.order) {
             0 -> {
                 YandexMetrica.reportEvent("Event: App uninstalled")
-                val uninstallIntent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri)
+                val uninstallIntent = Intent(Intent.ACTION_DELETE, packageUri)
                 startActivity(uninstallIntent)
             }
 
@@ -411,6 +404,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         class CustomAppInfo(var app: ApplicationInfo, var drawable: Drawable?, var name: String?)
 
         const val UPDATE_BACKGROUND = "maxim.drozd.maximdrozd_task1.upadte_backgeround"
+        const val UPDATE_BACKGROUND_ONCE = "maxim.drozd.maximdrozd_task1.upadte_backgeround_once"
 
         @Synchronized
         fun sort(context: Context) {
@@ -419,7 +413,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             val pm = context.packageManager
             if(newData == null) {
                 val pmData = context.packageManager.getInstalledApplications(0)
-                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+                        //.filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
                 newData = pmData
                         .map { app -> CustomAppInfo(app, null, null) }
                         .toMutableList()
@@ -462,24 +456,75 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             }
             Log.i("Shad", popularApps?.size.toString())
         }
+
+        fun getTimeOffsetAndPeriod(context: Context): Pair<Long, Long>{
+            val now = Calendar.getInstance()
+
+            val currHour = now.get(Calendar.HOUR_OF_DAY)
+            val currMinuets = now.get(Calendar.MINUTE)
+
+            val minLeft: Int
+            val hoursLeft: Int
+
+            val sp = PreferenceManager.getDefaultSharedPreferences(context)
+            val pref = sp.getString("preference_background_freq", "900000")
+            val period = pref!!.toLong()
+            when(pref){
+                "900000" -> {
+                    minLeft = 15 - (currMinuets % 15)
+                    hoursLeft = 0
+                }
+
+                "3600000" -> {
+                    minLeft = 60 - currMinuets
+                    hoursLeft = 0
+                }
+
+                "28800000" -> {
+                    minLeft = 60 - currMinuets
+                    hoursLeft = 8 - (currHour % 8)
+                }
+
+                "86400000" -> {
+                    minLeft = 60 - currMinuets
+                    hoursLeft = 24 - currHour
+                }
+                else ->{
+                    minLeft = Int.MAX_VALUE
+                    hoursLeft = Int.MAX_VALUE
+                }
+            }
+            Log.i("ShadJobs", "$hoursLeft $minLeft")
+            return Pair(minLeft.toLong() * 60000L + hoursLeft.toLong() * 3600000L, period)
+        }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.i("Shad", "AWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW1$requestCode $resultCode")
         if(requestCode == 100 && resultCode == Activity.RESULT_OK){
-            val contactUri = data?.data
-            val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
-            val cursor = this.contentResolver.query(contactUri!!, projection,
-                    null, null, null)
+            Thread(Runnable {
+                val contactUri = data?.data
+                val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                val cursor = this.contentResolver.query(contactUri!!, projection,
+                        null, null, null)
 
-            if (cursor != null && cursor.moveToFirst()) {
-                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
-                val number = cursor.getString(numberIndex)
-                Log.i("Shad", "AWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW$number")
-            }
-            cursor?.close()
+                if (cursor != null && cursor.moveToFirst()) {
+                    val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    val number = cursor.getString(numberIndex).filterNot { char -> char == ' ' || char == '-' }
 
+                    val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                    val name = cursor.getString(nameIndex)
+
+                    val fragm = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(launcher_view_pager.id, 2)) as DesktopFragment
+                    fragm.getContactInfo(name, number)
+                }
+                cursor?.close()
+            }).start()
         }
     }
+
+
+
+
 }

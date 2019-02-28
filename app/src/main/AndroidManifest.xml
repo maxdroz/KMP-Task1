@@ -2,10 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="maxim.drozd.maximdrozd_task1">
 
+
+    <!--TODO Grand permissions-->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <application
         android:allowBackup="true"
@@ -41,6 +45,9 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".launcher.LauncherActivity" />
         </activity>
+
+        <service android:name=".JobOffsetService"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
 
         <service android:name=".ImageLoaderService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

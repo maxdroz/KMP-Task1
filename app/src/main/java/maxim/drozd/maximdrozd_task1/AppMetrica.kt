@@ -21,10 +21,10 @@ class AppMetrica: Application() {
 
     override fun onCreate() {
         super.onCreate()
-//
-//        Fabric.with(this, Crashlytics())
-//
-//        AppCenter.start(this, "537ba06c-9f74-4109-bfa7-18ca47970105", Analytics::class.java, Crashes::class.java, Distribute::class.java)
+
+        Fabric.with(this, Crashlytics())
+
+        AppCenter.start(this, "537ba06c-9f74-4109-bfa7-18ca47970105", Analytics::class.java, Crashes::class.java, Distribute::class.java)
 
 
         val config = YandexMetricaConfig.newConfigBuilder(API_key).build()

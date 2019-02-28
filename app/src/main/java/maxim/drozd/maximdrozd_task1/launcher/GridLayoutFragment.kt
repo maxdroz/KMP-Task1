@@ -135,7 +135,7 @@ class GridLayoutFragment : Fragment() {
                                 view.itemView.findViewById<TextView>(R.id.app_name).text = LauncherActivity.newData!![pos].name
                                 view.itemView.tag = pos
                                 view.itemView.setOnClickListener {
-                                    (fragment.activity as ClickListener).onClick(pos, isPopular)
+                                    (fragment.activity as ClickListener).onClick(pos, isPopular, view.itemView)
                                 }
                             }
                         }
@@ -144,7 +144,7 @@ class GridLayoutFragment : Fragment() {
                     view.itemView.findViewById<TextView>(R.id.app_name).text = LauncherActivity.newData!![pos].name
                     view.itemView.findViewById<SquareImage>(R.id.square_image).setImageDrawable(LauncherActivity.newData!![pos].drawable)
                     view.itemView.tag = pos
-                    view.itemView.setOnClickListener { (fragment.activity as ClickListener).onClick(pos, isPopular) }
+                    view.itemView.setOnClickListener { (fragment.activity as ClickListener).onClick(pos, isPopular, view.itemView) }
                 }
             }
         }

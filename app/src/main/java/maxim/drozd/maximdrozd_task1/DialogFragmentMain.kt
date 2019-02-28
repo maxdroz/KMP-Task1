@@ -1,16 +1,12 @@
 package maxim.drozd.maximdrozd_task1
 
-import android.app.Activity
 import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
-import android.util.Log
 import android.widget.EditText
-import android.widget.Toast
-import kotlinx.android.synthetic.main.content_launcher.*
 import maxim.drozd.maximdrozd_task1.DB.AppDatabase
 import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
 import maxim.drozd.maximdrozd_task1.DB.Position
@@ -59,9 +55,9 @@ class DialogFragmentMain : DialogFragment() {
                     builder2.show()
                 }
                 else -> {
-                    val i = Intent(Intent.ACTION_PICK)
-                    i.type = ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
-                    activity?.startActivityForResult(i, 100)
+                    val intent = Intent(Intent.ACTION_PICK)
+                    intent.type = ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
+                    activity?.startActivityForResult(intent, 100)
                 }
             }
         }
