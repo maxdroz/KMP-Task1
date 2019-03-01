@@ -38,6 +38,9 @@ interface DesktopAppInfoDAO{
     @Query("SELECT pos FROM desktop")
     fun getAllTakenPositions(): List<Position>
 
+    @Query("SELECT imagePath FROM desktop")
+    fun getAppsImagePahs(): List<String>
+
     @Transaction
     fun migrate(prev: Position, to: Position){
         val data = getAppByPos(prev)

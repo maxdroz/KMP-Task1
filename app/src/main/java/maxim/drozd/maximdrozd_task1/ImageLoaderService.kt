@@ -11,10 +11,9 @@ import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.support.v7.preference.PreferenceManager
 import android.util.Log
+import maxim.drozd.maximdrozd_task1.DB.AppDatabase
 import maxim.drozd.maximdrozd_task1.launcher.LauncherActivity
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.IOException
+import java.io.*
 import java.net.URL
 
 
@@ -50,29 +49,36 @@ class ImageLoaderService: JobService() {
     override fun onStartJob(params: JobParameters?): Boolean {
 
         Log.i("ShadJobs", "in main job")
-        //TODO
         Thread(Runnable {
             Log.i("Shad", "job2")
 
-            val url = "https://picsum.photos/720/1080/?random"
-
             val sp = PreferenceManager.getDefaultSharedPreferences(this)
 
-            var path = sp.getString("file1_path", "")
-            Log.i("Shad", "$path 1")
-            if(path != "")
-                File(path).delete()
+            sp.edit().putLong("last_launch", System.currentTimeMillis()).apply()
 
-            path = sp.getString("file2_path", "")
-            Log.i("Shad", "$path 2")
-            if(path != "")
-                File(path).delete()
+            val iconsPaths = AppDatabase.getInstance(this).desktopAppInfo().getAppsImagePahs()
 
-            path = sp.getString("file3_path", "")
-            Log.i("Shad", "$path 3")
-            if(path != "")
-                File(path).delete()
+            cacheDir.listFiles().forEach { file ->
+                if(file.isFile){
+                    if(file.absolutePath.indexOf("file") != -1 || (file.absolutePath.indexOf("icon") != -1 && file.absolutePath !in iconsPaths)){
+                        file.delete()
+                    }
+                }
+            }
 
+            val urlId = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString("preference_background_source", "0")
+            val url: String = when(urlId){
+                "0" -> "https://loremflickr.com/720/1080"
+                "1" -> "https://picsum.photos/720/1080/?random"
+                "2" -> "http://lorempixel.com/720/1080/"
+                "3" -> "https://placeimg.com/720/1080/any"
+                "4" -> "https://placekitten.com/720/1080"
+                "5" -> "https://placebear.com/720/1080"
+                "6" -> "http://placebacon.net/720/1080"
+                else -> "https://source.unsplash.com/random/720x1080"
+            }
+
+            Log.i("ShadJobs", url)
 
             val bmp1 = loadBitmap(url)
             val bmp2 = loadBitmap(url)
@@ -90,14 +96,6 @@ class ImageLoaderService: JobService() {
             bmp3?.compress(Bitmap.CompressFormat.PNG, 0, bmpF3.outputStream())
             sp.edit().putString("file3_path", bmpF3.absolutePath).apply()
 
-
-//            Cache.getInstance().remove(LauncherActivity.CACHE_1)
-//            Cache.getInstance().remove(LauncherActivity.CACHE_2)
-//            Cache.getInstance().remove(LauncherActivity.CACHE_3)
-//
-//            Cache.getInstance().put(LauncherActivity.CACHE_1, bmp1)
-//            Cache.getInstance().put(LauncherActivity.CACHE_2, bmp2)
-//            Cache.getInstance().put(LauncherActivity.CACHE_3, bmp3)
             sendBroadcast(Intent(LauncherActivity.UPDATE_BACKGROUND))
 
             Log.i("Shad", "jobFinished")

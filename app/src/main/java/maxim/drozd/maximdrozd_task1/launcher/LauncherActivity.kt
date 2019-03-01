@@ -1,5 +1,6 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
+import android.Manifest
 import android.app.Activity
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
@@ -28,6 +29,7 @@ import android.provider.ContactsContract
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.support.v7.widget.RecyclerView
@@ -51,16 +53,9 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             when(action){
                 UPDATE_BACKGROUND -> {
                     Log.i("ShadJobs", "inBroadcastReciever")
-                    val sp = PreferenceManager.getDefaultSharedPreferences(context)
-                    val key = when (launcher_view_pager.currentItem) {
-                        0 -> sp.getString("file1_path", "")
-                        1 -> sp.getString("file2_path", "")
-                        else -> sp.getString("file3_path", "")
-                    }
-                    if (key != "") {
-                        val bmp = BitmapFactory.decodeFile(key)
-                        this@LauncherActivity.drawer_layout.background = BitmapDrawable(resources, bmp)
-                    }
+                    Thread(Runnable {
+                        updateBackground()
+                    }).start()
                 }
                 UPDATE_BACKGROUND_ONCE -> {
                     Log.i("ShadJobs", "inBroadcastRecieverOnce")
@@ -70,6 +65,29 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                             .setOverrideDeadline(0L)
                             .build())
                 }
+            }
+        }
+    }
+
+    fun updateBackground(){
+        val sp = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val isSameBackground = !sp.getBoolean("preference_background_diff", true)
+
+        val key = if(isSameBackground){
+            sp.getString("file1_path", "")
+        }
+        else{
+            when (launcher_view_pager.currentItem) {
+                0 -> sp.getString("file1_path", "")
+                1 -> sp.getString("file2_path", "")
+                else -> sp.getString("file3_path", "")
+            }
+        }
+        if (key != "") {
+            val bmp = BitmapFactory.decodeFile(key)
+            runOnUiThread {
+                this@LauncherActivity.drawer_layout.background = BitmapDrawable(resources, bmp)
             }
         }
     }
@@ -141,6 +159,9 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             }
 
             override fun onPageSelected(position: Int) {
+                Thread(Runnable {
+                    updateBackground()
+                }).start()
                 nav_view.menu.getItem(2 - position).isChecked = true
                 if(position == 2){
                     app_bar_layout.visibility = View.INVISIBLE
@@ -153,14 +174,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                     val params = behaviour.layoutParams as CoordinatorLayout.LayoutParams
                     params.behavior = AppBarLayout.ScrollingViewBehavior()
                     behaviour.requestLayout()
-                    val fragm = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(launcher_view_pager.id, 2)) as DesktopFragment
-                    if(fragm.active != null){
-                        fragm.active = null
-                        fragm.activeView = null
-                        fragm.update()
-                    }
                 }
-
             }
 
             override fun onPageScrollStateChanged(state: Int) {
@@ -168,19 +182,11 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         })
 
-        val (offset, period) = getTimeOffsetAndPeriod(this)
+        if(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(this).getLong("last_launch", 0L) <
+                PreferenceManager.getDefaultSharedPreferences(this).getString("preference_background_freq", "900000")!!.toLong()){
+            sendBroadcast(Intent(UPDATE_BACKGROUND_ONCE))
+        }
 
-        val bundle = PersistableBundle()
-        bundle.putLong("offset", offset)
-        bundle.putLong("period", period)
-
-        val jobber = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        jobber.schedule(JobInfo.Builder(0,
-                ComponentName(applicationContext, JobOffsetService::class.java))
-                .setOverrideDeadline(0L)
-                .setExtras(bundle)
-                .build())
-//        jobber.
 
         val firstStart = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_welcome", true)
 
@@ -190,6 +196,18 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         }else if (newData == null) {
             nav_view.menu.getItem(0).isChecked = true
             Thread(Runnable {
+                val (offset, period) = getTimeOffsetAndPeriod(this)
+
+                val bundle = PersistableBundle()
+                bundle.putLong("offset", offset)
+                bundle.putLong("period", period)
+
+                val jobber = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+                jobber.schedule(JobInfo.Builder(0,
+                        ComponentName(applicationContext, JobOffsetService::class.java))
+                        .setOverrideDeadline(0L)
+                        .setExtras(bundle)
+                        .build())
                 sort(this)
             }).start()
         }
@@ -221,6 +239,9 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             YandexMetrica.reportEvent("Event: Profile opened")
             startActivity(Intent(this, ProfileActivity::class.java))
         }
+        ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.REQUEST_DELETE_PACKAGES, Manifest.permission.REQUEST_INSTALL_PACKAGES, Manifest.permission.CALL_PHONE), 1)
+
     }
 
     override fun onBackPressed() {
@@ -413,7 +434,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             val pm = context.packageManager
             if(newData == null) {
                 val pmData = context.packageManager.getInstalledApplications(0)
-                        //.filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
                 newData = pmData
                         .map { app -> CustomAppInfo(app, null, null) }
                         .toMutableList()
@@ -496,6 +517,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             }
             Log.i("ShadJobs", "$hoursLeft $minLeft")
             return Pair(minLeft.toLong() * 60000L + hoursLeft.toLong() * 3600000L, period)
+//            return Pair(1000L, 1000L)
         }
 
     }

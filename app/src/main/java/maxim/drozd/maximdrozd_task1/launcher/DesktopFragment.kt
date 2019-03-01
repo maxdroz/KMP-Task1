@@ -1,22 +1,24 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
 import android.app.Activity
+import android.content.ClipData
 import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.opengl.Visibility
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Looper
+import android.os.*
+import android.preference.PreferenceManager
 import android.provider.ContactsContract
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.widget.ImageViewCompat
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -25,6 +27,7 @@ import maxim.drozd.maximdrozd_task1.*
 import maxim.drozd.maximdrozd_task1.DB.AppDatabase
 import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
 import maxim.drozd.maximdrozd_task1.DB.Position
+import maxim.drozd.maximdrozd_task1.DB.PositionConverter
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -38,13 +41,12 @@ class DesktopFragment: Fragment(){
 
     private val handlerThread = HandlerThread("thread2")
 
-    val height = 5
-    val width = 4
+    var height = 5
+    var width = 4
 
     var contactPos: Position? = null
 
     var active: Position? = null
-    var activeView: View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.desktop, container, false)
@@ -55,7 +57,68 @@ class DesktopFragment: Fragment(){
         if(!handlerThread.isAlive)
             handlerThread.start()
 
-        val handler = Handler(handlerThread.looper)
+        //useless dummy draglistener to fix a bug
+        empty.setOnDragListener{ _: View, dragEvent: DragEvent ->
+
+            val action = dragEvent.action
+            val dropView = dragEvent.localState as View
+            val dropImage = dropView.findViewById<ImageView>(R.id.square_image)
+            val dropText = dropView.findViewById<TextView>(R.id.app_name)
+
+            val image = view.findViewById<ImageView>(R.id.square_image)
+            val text = view.findViewById<TextView>(R.id.app_name)
+
+            when(action){
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    return@setOnDragListener true
+                }
+
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    image.visibility = View.VISIBLE
+                    image.setImageDrawable(dropImage.drawable)
+                    text.text = dropText.text
+                    return@setOnDragListener true
+                }
+
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    image.visibility = View.INVISIBLE
+                    image.setImageResource(R.drawable.default_web_icon)
+                    text.text = ""
+                    view.setBackgroundResource(R.drawable.app_selector)
+                    return@setOnDragListener true
+                }
+                DragEvent.ACTION_DROP -> {
+                    view.setBackgroundResource(R.drawable.app_selector)
+                    active = Position(0, 0)
+                    Thread(Runnable {
+                        AppDatabase.getInstance(context!!).desktopAppInfo().migrate(PositionConverter().toPosition(dropView.tag as String), Position(0, 0))
+                        update()
+                    }).start()
+                    return@setOnDragListener true
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    dropView.post {
+                        dropView.visibility = View.VISIBLE
+                    }
+                    return@setOnDragListener true
+                }
+            }
+
+            return@setOnDragListener false
+        }
+
+        val orientation = resources.configuration.orientation
+
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            height = 3
+            width = 7
+        } else {
+            height = 5
+            width = 4
+        }
+
+
+            val handler = Handler(handlerThread.looper)
         for(i in 0 until height){
             val row = TableRow(context)
             var param = TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.MATCH_PARENT, 0f)
@@ -106,16 +169,27 @@ class DesktopFragment: Fragment(){
 
 
     private fun bindView(view: View, info: DesktopAppInfo){
+        view.setOnDragListener(null)
+        view.tag = PositionConverter().fromPosition(info.pos)
         view.setOnLongClickListener {
             active = info.pos
-            activeView = view
-            view.setBackgroundResource(R.drawable.move_selector)
+            val data = ClipData.newPlainText("", "")
+            val shadowBuilder = View.DragShadowBuilder(view)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                view.startDragAndDrop(data, shadowBuilder, view, 0)
+            } else {
+                @Suppress("DEPRECATION")
+                view.startDrag(data, shadowBuilder, view, 0)
+            }
+
+            view.visibility = View.INVISIBLE
+
             Log.i("Shad", "active set")
             Snackbar.make(view, getString(R.string.delete_icon), Snackbar.LENGTH_LONG)
                     .setAction(getString(R.string.yes)){
                         Thread(Runnable {
                             File(info.imagePath).delete()
-                            AppDatabase.getInstance(context!!).desktopAppInfo().deletePos(info.pos)
+                            AppDatabase.getInstance(context!!).desktopAppInfo().deletePos(active!!)
                             update()
                         }).start()
                     }.show()
@@ -123,12 +197,6 @@ class DesktopFragment: Fragment(){
         }
 
         view.setOnClickListener {
-            if(active != null){
-                active = null
-                activeView?.setBackgroundResource(R.drawable.app_selector)
-                activeView = null
-                return@setOnClickListener
-            }
             when(info.type){
                 0 -> {
                     val siteUrl = Uri.parse(info.value)
@@ -155,18 +223,57 @@ class DesktopFragment: Fragment(){
 
 
     private fun bindEmpty(view: View, h: Int, w: Int){
-        view.setBackgroundResource(R.drawable.app_selector)
-        view.setOnClickListener {
-            if(active != null){
-                activeView?.setBackgroundResource(R.drawable.app_selector)
-                activeView = null
-                Thread(Runnable {
-                    AppDatabase.getInstance(context!!).desktopAppInfo().migrate(active!!, Position(h, w))
-                    update()
-                    active = null
-                }).start()
+        view.tag = null
+        view.setOnDragListener{ _: View, dragEvent: DragEvent ->
+
+            val action = dragEvent.action
+            val dropView = dragEvent.localState as View
+            val dropImage = dropView.findViewById<ImageView>(R.id.square_image)
+            val dropText = dropView.findViewById<TextView>(R.id.app_name)
+
+            val image = view.findViewById<ImageView>(R.id.square_image)
+            val text = view.findViewById<TextView>(R.id.app_name)
+
+            when(action){
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    return@setOnDragListener true
+                }
+
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    image.visibility = View.VISIBLE
+                    image.setImageDrawable(dropImage.drawable)
+                    text.text = dropText.text
+                    return@setOnDragListener true
+                }
+
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    image.visibility = View.INVISIBLE
+                    image.setImageResource(R.drawable.default_web_icon)
+                    text.text = ""
+                    view.setBackgroundResource(R.drawable.app_selector)
+                    return@setOnDragListener true
+                }
+                DragEvent.ACTION_DROP -> {
+                    view.setBackgroundResource(R.drawable.app_selector)
+                    active = Position(h, w)
+                    Thread(Runnable {
+                        AppDatabase.getInstance(context!!).desktopAppInfo().migrate(PositionConverter().toPosition(dropView.tag as String), Position(h, w))
+                        update()
+                    }).start()
+                    return@setOnDragListener true
+                }
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    dropView.post {
+                        dropView.visibility = View.VISIBLE
+                    }
+                    return@setOnDragListener true
+                }
             }
+
+            return@setOnDragListener false
         }
+
+        view.setBackgroundResource(R.drawable.app_selector)
         view.setOnLongClickListener {
             contactPos = Position(h, w)
             val df = DialogFragmentMain.create(h, w)
@@ -244,7 +351,7 @@ class DesktopFragment: Fragment(){
 
     fun update(){
         table ?: return
-        for(i in 0 until height * 2 - 1){
+        for(i in 0 until height * 2){
             val row = table.getChildAt(i) as? LinearLayout
             row ?: continue
             for(j in 0 until width){
@@ -256,8 +363,7 @@ class DesktopFragment: Fragment(){
                 if(desktopAppInfo != null) {
                     val bmp = getImage(desktopAppInfo)
                     Handler(Looper.getMainLooper()).post {
-                        if(v != activeView)
-                            v.setBackgroundResource(R.drawable.app_selector)
+                        v.setBackgroundResource(R.drawable.app_selector)
                         image.visibility = View.VISIBLE
                         image.setImageBitmap(bmp)
                         text.text = desktopAppInfo.text

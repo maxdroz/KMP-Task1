@@ -119,7 +119,7 @@ class PreferencesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val dark = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_dark_theme", false)
-        val themeId = if (dark) R.style.DarkAppThemeNoActionBar else R.style.AppThemeNoActionBar
+        val themeId = if (dark) R.style.DarkAppTheme else R.style.AppTheme
         setTheme(themeId)
 
         setContentView(R.layout.preference_holder)

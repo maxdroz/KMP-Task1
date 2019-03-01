@@ -70,6 +70,8 @@
     <string name="bkg_frq">Background image change frequency</string>
     <string name="bkg_frq_desk">Defines frequency of changing background image</string>
     <string name="upd_bkg_now">Update background image now</string>
+    <string name="wait">Wait a minute for background to update</string>
+    <string name="wp6">To add app to Desktop, open context menu in a grid or linear layout\nTo add URL or contact long click on place? where you want to put it.\nTo Delete or move icon, long press it</string>
 
     <string-array name="sorts">
         <item>No sort</item>
@@ -80,10 +82,14 @@
     </string-array>
 
     <string-array name="sources">
-        <item>loremflickr</item>
-        <item>picsum</item>
-        <item>thecatapi</item>
-        <item>unsplash</item>
+        <item>loremflickr.com</item>
+        <item>picsum.photos</item>
+        <item>lorempixel.com</item>
+        <item>placeimg.com</item>
+        <item>placekitten.com</item>
+        <item>placebear.com</item>
+        <item>placebacon.net</item>
+        <item>source.unsplash.com</item>
     </string-array>
 
     <string-array name="sources_val">
@@ -91,6 +97,10 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
     </string-array>
 
     <string-array name="timings">
