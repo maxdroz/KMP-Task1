@@ -23,7 +23,7 @@
     <string name="dark_theme">Темная тема</string>
     <string-array name="sorts">
         <item>Без сортировки</item>
-        <item>По дате</item>
+        <item>По дате установки</item>
         <item>По алфавиту А-Я</item>
         <item>По алфавиту Я-A</item>
         <item>По частоте</item>
@@ -62,4 +62,5 @@
     <string name="delete_menu">Удалить</string>
     <string name="frq_menu">Частота</string>
     <string name="about_menu">О приложении</string>
+    <string name="sort_type">Вид сортировки:</string>
 </resources>

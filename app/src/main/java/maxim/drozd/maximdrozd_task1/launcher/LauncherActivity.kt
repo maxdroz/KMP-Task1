@@ -84,6 +84,14 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                 ?.findViewById<RecyclerView>(R.id.grid_recycler)
                 ?.adapter
                 ?.notifyDataSetChanged()
+
+        this@LauncherActivity
+                .supportFragmentManager
+                .fragments[0]
+                .view
+                ?.findViewById<RecyclerView>(R.id.list_recycler)
+                ?.adapter
+                ?.notifyDataSetChanged()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,21 +121,24 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             Log.i("Shad", "1")
             startActivity(Intent(this, WelcomePageActivity::class.java))
             return
-        } else if(newData == null){
+        } else if (newData == null) {
             Log.i("Shad", "2")
             nav_view.menu.getItem(0).isChecked = true
             Thread(Runnable {
                 sort(this)
                 runOnUiThread {
-                    if (!tooLate && supportFragmentManager.fragments.size == 0)
-                        supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
+                    if (supportFragmentManager.fragments.size == 0)
+                        try {
+                            supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
+                        } catch(e :Exception) {
+                        }
                 }
             }).start()
+        } else {
+            Log.i("Shad", "3")
+            if (supportFragmentManager.fragments.size == 0)
+                supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
         }
-        Log.i("Shad", "3")
-        if (supportFragmentManager.fragments.size == 0)
-            supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
-
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, main_toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
