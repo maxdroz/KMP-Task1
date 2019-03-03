@@ -1,5 +1,7 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
+import android.Manifest
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,7 +28,13 @@ import android.view.Menu
 import android.net.Uri
 import android.util.Log
 import android.content.IntentFilter
+import android.os.Build
+import android.provider.Settings
+import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import android.support.v7.widget.RecyclerView
+import kotlinx.android.synthetic.main.content_launcher.*
+import java.lang.StringBuilder
 
 interface ClickListener {
     fun onClick(position: Int)
@@ -99,44 +107,46 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         intentFilter.addDataScheme("package")
         registerReceiver(monitor, intentFilter)
 
-        if (newData == null) {
+        val firstStart = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_welcome", true)
 
-            if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("preference_welcome", true)) {
-                startActivity(Intent(this, WelcomePageActivity::class.java))
-            }
+        if (newData == null && firstStart) {
+            Log.i("Shad", "1")
+            startActivity(Intent(this, WelcomePageActivity::class.java))
+            return
+        } else if(newData == null){
+            Log.i("Shad", "2")
             nav_view.menu.getItem(0).isChecked = true
             Thread(Runnable {
-                val pmData = this.packageManager.getInstalledApplications(0)
-                    .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
-
-                newData = pmData
-                    .map { app -> CustomAppInfo(app, null, null) }
-                    .toMutableList()
-
+                sort(this)
                 runOnUiThread {
                     if (!tooLate && supportFragmentManager.fragments.size == 0)
                         supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
                 }
-
-                AppDatabase.getInstance(this).appInfo().updateAllAps(pmData.map { app -> AppInfo(app.packageName) })
             }).start()
-        } else {
-            if (supportFragmentManager.fragments.size == 0)
-                supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
         }
+        Log.i("Shad", "3")
+        if (supportFragmentManager.fragments.size == 0)
+            supportFragmentManager.beginTransaction().add(R.id.fragment_launcher, GridLayoutFragment()).commit()
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, main_toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        supportActionBar?.title = getString(R.string.launcher)
+        val sortType = StringBuilder(resources.getStringArray(R.array.sorts)[PreferenceManager.getDefaultSharedPreferences(this).getString("preference_sort", "0")!!.toInt()])
+        sortType[0] = sortType[0].toLowerCase()
+
+        supportActionBar?.title = getString(R.string.sort_type) + " " + sortType
 
         nav_view.setNavigationItemSelectedListener(::onNavigationItemSelected)
 
         nav_view.getHeaderView(0).findViewById<View>(R.id.imageViewHeader).setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
         }
+
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.REQUEST_DELETE_PACKAGES, Manifest.permission.REQUEST_INSTALL_PACKAGES, Manifest.permission.CALL_PHONE), 1)
+
+
     }
 
     override fun onBackPressed() {
@@ -193,12 +203,16 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                 notifyDataSet()
             }
         }).start()
-        startActivity(Intent(packageManager.getLaunchIntentForPackage(newData!![position].app.packageName)))
+        try{
+            startActivity(Intent(packageManager.getLaunchIntentForPackage(newData!![position].app.packageName)))
+        } catch (e: Exception) {
+            Snackbar.make(fragment_launcher, "Unable to start app", Snackbar.LENGTH_SHORT).show()
+        }
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
-        menu?.setHeaderTitle("Context Menu")
+        menu?.setHeaderTitle(newData!![v!!.tag as Int].name)
         menu?.add(v?.tag as Int, Menu.NONE, 0, getString(R.string.delete_menu))
         val count = AppDatabase.getInstance(this).appInfo().getTimesLaunchedApp(newData!![v!!.tag as Int].app.packageName)[0]
         menu?.add(v.tag as Int, Menu.NONE, 1, getString(R.string.frq_menu) + ": $count")
@@ -210,8 +224,25 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         val packageUri = Uri.parse(pn)
         when (item.order) {
             0 -> {
-                val uninstallIntent = Intent(Intent.ACTION_UNINSTALL_PACKAGE, packageUri)
-                startActivity(uninstallIntent)
+//                if(Build.VERSION.SDK_INT >= 26){
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        if (!packageManager.canRequestPackageInstalls()) {
+//                            startActivityForResult(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).setData(Uri.parse(String.format("package:%s", packageName))), 1234)
+//                        } else {
+//                            callInstallProcess()
+//                        }
+//                    } else {
+//                        callInstallProcess()
+//                    }
+//                    val appPackage = newData!![item.groupId].app.packageName
+//                    val intent = Intent(this, this::class.java)
+//                    val sender = PendingIntent.getActivity(this, 0, intent, 0)
+//                    val mPackageInstaller = this.packageManager.packageInstaller
+//                    mPackageInstaller.uninstall(appPackage, sender.intentSender)
+//                }else{
+                    val uninstallIntent = Intent(Intent.ACTION_DELETE, packageUri)
+                    startActivity(uninstallIntent)
+//                }
             }
 
             2 -> {
@@ -232,14 +263,26 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
     companion object {
         var tooLate = false
-        var somethingChanged = false
+        var somethingChanged = true
         var sortMethodChanged = true
         var popularApps: MutableList<Int> = mutableListOf()
         var newData: MutableList<CustomAppInfo>? = null
         class CustomAppInfo(var app: ApplicationInfo, var drawable: Drawable?, var name: String?)
 
+        @Synchronized
         fun sort(context: Context) {
+            Log.i("Shad", "sort!")
+
             val pm = context.packageManager
+            if(newData == null) {
+                val pmData = context.packageManager.getInstalledApplications(0)
+//                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+                newData = pmData
+                        .map { app -> CustomAppInfo(app, null, null) }
+                        .toMutableList()
+                AppDatabase.getInstance(context).appInfo().updateAllAps(pmData.map { app -> AppInfo(app.packageName) })
+            }
+
             when (PreferenceManager.getDefaultSharedPreferences(context).getString("preference_sort", "0")) {
                 "1" -> {
                     newData?.sortByDescending { app -> pm.getPackageInfo(app.app.packageName, 0).firstInstallTime }
@@ -273,6 +316,7 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                         .map { app -> app.second }
                         .toMutableList()
             }
+            Log.i("Shad", popularApps.size.toString())
         }
     }
 }

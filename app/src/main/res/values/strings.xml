@@ -62,4 +62,5 @@
     <string name="delete_menu">Delete</string>
     <string name="frq_menu">Frequency</string>
     <string name="about_menu">About</string>
+    <string name="sort_type">Sort type:</string>
 </resources>
