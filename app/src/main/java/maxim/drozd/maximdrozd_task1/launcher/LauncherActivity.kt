@@ -239,8 +239,6 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             YandexMetrica.reportEvent("Event: Profile opened")
             startActivity(Intent(this, ProfileActivity::class.java))
         }
-        ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.REQUEST_DELETE_PACKAGES, Manifest.permission.REQUEST_INSTALL_PACKAGES, Manifest.permission.CALL_PHONE), 1)
 
     }
 
@@ -434,7 +432,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             val pm = context.packageManager
             if(newData == null) {
                 val pmData = context.packageManager.getInstalledApplications(0)
-                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+//                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
+                        .filterNot { appInfo -> pm.getLaunchIntentForPackage(appInfo.packageName) == null || appInfo.packageName == context.packageName}
                 newData = pmData
                         .map { app -> CustomAppInfo(app, null, null) }
                         .toMutableList()

@@ -1,5 +1,6 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
+import android.Manifest
 import android.app.Activity
 import android.content.ClipData
 import android.content.ContentUris
@@ -9,14 +10,17 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.opengl.Visibility
 import android.os.*
 import android.preference.PreferenceManager
 import android.provider.ContactsContract
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.widget.ImageViewCompat
 import android.util.Log
@@ -212,6 +216,10 @@ class DesktopFragment: Fragment(){
                     }
                 }
                 else -> {
+                    ActivityCompat.requestPermissions(activity as Activity,
+                            arrayOf(Manifest.permission.CALL_PHONE),
+                            1)
+
                     val number = Uri.parse("tel:${info.value}")
                     val dial = Intent(Intent.ACTION_CALL, number)
                     startActivity(dial)
@@ -318,14 +326,14 @@ class DesktopFragment: Fragment(){
 
                 }
                 1 -> {
-                    (LauncherActivity
+                    val bmp = LauncherActivity
                             .newData
                             ?.find {
                                 app -> info.value == app.app.packageName
                             }
-                            ?.drawable as? BitmapDrawable)
-                            ?.bitmap?:
-                    (context!!.packageManager.getApplicationIcon(info.value)as BitmapDrawable).bitmap
+                            ?.drawable
+                    getBitmapFromDrawable(bmp)?:
+                    getBitmapFromDrawable(context!!.packageManager.getApplicationIcon(info.value))!!
                 }
                 else -> {
                     BitmapFactory.decodeResource(resources, R.drawable.default_contact_icon)
@@ -347,6 +355,16 @@ class DesktopFragment: Fragment(){
            AppDatabase.getInstance(context!!).desktopAppInfo().insertAll(DesktopAppInfo(contactPos!!, 2, data, name))
            update()
         }
+    }
+
+    fun getBitmapFromDrawable(drawable: Drawable?): Bitmap? {
+        if(drawable == null)
+            return null
+        val bmp = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        return bmp
     }
 
     fun update(){

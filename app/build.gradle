@@ -27,10 +27,6 @@ android {
         disable 'RtlCompat'
     }
 
-    dataBinding {
-        enabled = true
-    }
-
     signingConfigs {
         config {
             keyAlias 'key0'
@@ -65,7 +61,6 @@ allprojects {
 }
 
 dependencies {
-    kapt "com.android.databinding:compiler:3.3.2"
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
