@@ -6,6 +6,8 @@
         android:protectionLevel="signature"/>
     <permission android:name="maxim.drozd.maximdrozd_task1.PermissionProviderRead"
         android:protectionLevel="signature"/>
+    <permission android:name="maxim.drozd.maximdrozd_task1.profile"
+        android:protectionLevel="signature"/>
     
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -63,6 +65,11 @@
             android:readPermission="maxim.drozd.maximdrozd_task1.PermissionProviderRead"
             android:name=".db.Provider"/>
 
+        <provider
+            android:exported="true"
+            android:authorities="maxim.drozd.maximdrozd_task2"
+            android:name=".db.ProfileProvider"
+            android:permission="maxim.drozd.maximdrozd_task1.profile"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
