@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                     sb.appendln(app.launchCount)
                     sb.appendln()
                 }
-                val s = sb.substring(0, sb.lastIndex - 2)
+                val s = sb.substring(0, sb.lastIndex - 1)
                 runOnUiThread {
                     apps_list.text = s
                 }
