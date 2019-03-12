@@ -7,9 +7,9 @@ import android.support.v4.app.DialogFragment
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
-import maxim.drozd.maximdrozd_task1.DB.AppDatabase
-import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
-import maxim.drozd.maximdrozd_task1.DB.Position
+import maxim.drozd.maximdrozd_task1.db.AppDatabase
+import maxim.drozd.maximdrozd_task1.db.DesktopAppInfo
+import maxim.drozd.maximdrozd_task1.db.Position
 import maxim.drozd.maximdrozd_task1.launcher.DesktopFragment
 import maxim.drozd.maximdrozd_task1.launcher.LauncherFragmentPageAdaptor
 import android.provider.ContactsContract

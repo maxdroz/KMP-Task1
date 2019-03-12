@@ -1,6 +1,5 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
-import android.Manifest
 import android.app.Activity
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
@@ -18,8 +17,8 @@ import android.view.MenuItem
 import android.view.View
 import kotlinx.android.synthetic.main.activity_launcher.*
 import kotlinx.android.synthetic.main.app_bar_launcher.*
-import maxim.drozd.maximdrozd_task1.DB.AppDatabase
-import maxim.drozd.maximdrozd_task1.DB.AppInfo
+import maxim.drozd.maximdrozd_task1.db.AppDatabase
+import maxim.drozd.maximdrozd_task1.db.AppInfo
 import maxim.drozd.maximdrozd_task1.welcome_pages.WelcomePageActivity
 import android.view.ContextMenu
 import android.view.Menu
@@ -29,15 +28,14 @@ import android.provider.ContactsContract
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
-import android.support.v4.app.ActivityCompat
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.support.v7.widget.RecyclerView
 import com.yandex.metrica.YandexMetrica
 import kotlinx.android.synthetic.main.content_launcher.*
 import maxim.drozd.maximdrozd_task1.*
-import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
-import maxim.drozd.maximdrozd_task1.DB.Position
+import maxim.drozd.maximdrozd_task1.db.DesktopAppInfo
+import maxim.drozd.maximdrozd_task1.db.Position
 import java.lang.Exception
 import java.util.*
 
@@ -74,20 +72,46 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         val isSameBackground = !sp.getBoolean("preference_background_diff", true)
 
-        val key = if(isSameBackground){
-            sp.getString("file1_path", "")
-        }
-        else{
-            when (launcher_view_pager.currentItem) {
-                0 -> sp.getString("file1_path", "")
-                1 -> sp.getString("file2_path", "")
-                else -> sp.getString("file3_path", "")
+        if(isSameBackground){
+            val path = sp.getString("file1_path", "")
+            if(path != ""){
+                val bmp = BitmapFactory.decodeFile(path)
+                val fragment0 = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(R.id.launcher_view_pager, 0))
+                val fragment1 = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(R.id.launcher_view_pager, 1))
+                val fragment2 = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(R.id.launcher_view_pager, 2))
+
+                fragment0?.view?.background = BitmapDrawable(resources, bmp)
+                fragment1?.view?.background = BitmapDrawable(resources, bmp)
+                fragment2?.view?.background = BitmapDrawable(resources, bmp)
+
             }
-        }
-        if (key != "") {
-            val bmp = BitmapFactory.decodeFile(key)
-            runOnUiThread {
-                this@LauncherActivity.drawer_layout.background = BitmapDrawable(resources, bmp)
+        } else {
+            val path0 = sp.getString("file1_path", "")
+            val path1 = sp.getString("file2_path", "")
+            val path2 = sp.getString("file3_path", "")
+
+            if(path0 != ""){
+                val bmp0 = BitmapFactory.decodeFile(path0)
+                val fragment0 = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(R.id.launcher_view_pager, 0))
+                runOnUiThread {
+                    fragment0?.view?.background = BitmapDrawable(resources, bmp0)
+                }
+            }
+
+            if(path1 != ""){
+                val bmp1 = BitmapFactory.decodeFile(path1)
+                val fragment1 = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(R.id.launcher_view_pager, 1))
+                runOnUiThread {
+                    fragment1?.view?.background = BitmapDrawable(resources, bmp1)
+                }
+
+            }
+            if(path2 != ""){
+                val bmp2 = BitmapFactory.decodeFile(path2)
+                val fragment2 = supportFragmentManager.findFragmentByTag(LauncherFragmentPageAdaptor.makeFragmentName(R.id.launcher_view_pager, 2))
+                runOnUiThread {
+                    fragment2?.view?.background = BitmapDrawable(resources, bmp2)
+                }
             }
         }
     }
@@ -182,9 +206,14 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
 
         })
 
-        if(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(this).getLong("last_launch", 0L) <
+
+        Log.i("Shad", (System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(this).getLong("last_launch", 0L)).toString())
+        Log.i("Shad", PreferenceManager.getDefaultSharedPreferences(this).getString("preference_background_freq", "900000"))
+        if(System.currentTimeMillis() - PreferenceManager.getDefaultSharedPreferences(this).getLong("last_launch", 0L) >
                 PreferenceManager.getDefaultSharedPreferences(this).getString("preference_background_freq", "900000")!!.toLong()){
-            sendBroadcast(Intent(UPDATE_BACKGROUND_ONCE))
+            register()
+            Log.i("Shad", "inUpdate")
+            this.sendBroadcast(Intent(UPDATE_BACKGROUND_ONCE))
         }
 
 
@@ -250,18 +279,20 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-
+    fun register(){
         var intentFilter2 = IntentFilter(UPDATE_BACKGROUND_ONCE)
         intentFilter2.addAction(UPDATE_BACKGROUND)
         registerReceiver(backgroundMonitor, intentFilter2)
-
+        Log.i("Shad", "br.ON")
         intentFilter2 = IntentFilter(Intent.ACTION_PACKAGE_REMOVED)
         intentFilter2.addAction(Intent.ACTION_PACKAGE_ADDED)
         intentFilter2.addDataScheme("package")
         registerReceiver(monitor, intentFilter2)
+    }
 
+    override fun onStart() {
+        super.onStart()
+        register()
     }
 
     override fun onResume() {
@@ -282,6 +313,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
     }
 
     override fun onDestroy() {
+
+        Log.i("Shad", "br.OFF")
         unregisterReceiver(backgroundMonitor)
         unregisterReceiver(monitor)
         super.onDestroy()
@@ -350,7 +383,8 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         super.onCreateContextMenu(menu, v, menuInfo)
         menu?.setHeaderTitle(newData!![v!!.tag as Int].name)
-        menu?.add(v?.tag as Int, Menu.NONE, 0, getString(R.string.delete_menu))
+        if(newData!![v!!.tag as Int].app.flags and ApplicationInfo.FLAG_SYSTEM == 0)
+            menu?.add(v.tag as Int, Menu.NONE, 0, getString(R.string.delete_menu))
         val count = AppDatabase.getInstance(this).appInfo().getTimesLaunchedApp(newData!![v!!.tag as Int].app.packageName)[0]
         menu?.add(v.tag as Int, Menu.NONE, 1, getString(R.string.frq_menu) + ": $count")
         menu?.add(v.tag as Int, Menu.NONE, 2, getString(R.string.about_menu))
@@ -409,13 +443,9 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
         return true
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-            tooLate = true
-    }
 
     companion object {
-        var tooLate = false
+        var updatingBackground = false
         var somethingChanged = false
         var sortMethodChanged = true
         var popularApps: MutableList<Int>? = null
@@ -432,13 +462,18 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
             val pm = context.packageManager
             if(newData == null) {
                 val pmData = context.packageManager.getInstalledApplications(0)
-//                        .filter { appInfo -> appInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0 }
                         .filterNot { appInfo -> pm.getLaunchIntentForPackage(appInfo.packageName) == null || appInfo.packageName == context.packageName}
                 newData = pmData
                         .map { app -> CustomAppInfo(app, null, null) }
                         .toMutableList()
-                AppDatabase.getInstance(context).appInfo().updateAllAps(pmData.map { app -> AppInfo(app.packageName) })
-                AppDatabase.getInstance(context).desktopAppInfo().updateAllApps(pmData.map { app -> app.packageName })
+                try {
+                    AppDatabase.getInstance(context).appInfo().updateAllAps(pmData.map { app -> AppInfo(app.packageName) })
+                    AppDatabase.getInstance(context).desktopAppInfo().updateAllApps(pmData.map { app -> app.packageName })
+                } catch(e: Exception) {
+                    AppDatabase.getInstance(context).clearAllTables()
+                    AppDatabase.getInstance(context).appInfo().updateAllAps(pmData.map { app -> AppInfo(app.packageName) })
+                    AppDatabase.getInstance(context).desktopAppInfo().updateAllApps(pmData.map { app -> app.packageName })
+                }
             }
 
             when (PreferenceManager.getDefaultSharedPreferences(context).getString("preference_sort", "0")) {

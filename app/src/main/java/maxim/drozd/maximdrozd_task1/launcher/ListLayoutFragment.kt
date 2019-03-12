@@ -1,6 +1,8 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -35,6 +37,17 @@ class ListLayoutFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
             val off = resources.getDimensionPixelOffset(R.dimen.offset)
             addItemDecoration(GridLayoutFragment.GridViewDecorator(off))
+        }
+
+        val sp = PreferenceManager.getDefaultSharedPreferences(context)
+
+        val path0 = sp.getString("file1_path", "")
+
+        if(path0 != ""){
+            val bmp0 = BitmapFactory.decodeFile(path0)
+            Handler(Looper.getMainLooper()).post {
+                view.background = BitmapDrawable(resources, bmp0)
+            }
         }
     }
 

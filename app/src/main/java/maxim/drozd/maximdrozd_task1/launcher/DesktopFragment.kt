@@ -3,10 +3,7 @@ package maxim.drozd.maximdrozd_task1.launcher
 import android.Manifest
 import android.app.Activity
 import android.content.ClipData
-import android.content.ContentUris
-import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -15,31 +12,25 @@ import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.*
 import android.preference.PreferenceManager
-import android.provider.ContactsContract
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
-import android.support.v4.widget.ImageViewCompat
 import android.util.Log
 import android.view.*
 import android.widget.*
 import kotlinx.android.synthetic.main.desktop.*
 import maxim.drozd.maximdrozd_task1.*
-import maxim.drozd.maximdrozd_task1.DB.AppDatabase
-import maxim.drozd.maximdrozd_task1.DB.DesktopAppInfo
-import maxim.drozd.maximdrozd_task1.DB.Position
-import maxim.drozd.maximdrozd_task1.DB.PositionConverter
+import maxim.drozd.maximdrozd_task1.db.AppDatabase
+import maxim.drozd.maximdrozd_task1.db.DesktopAppInfo
+import maxim.drozd.maximdrozd_task1.db.Position
+import maxim.drozd.maximdrozd_task1.db.PositionConverter
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.lang.Exception
-import java.lang.StringBuilder
-import java.net.URI
 import java.net.URL
-import java.util.*
 
 class DesktopFragment: Fragment(){
 
@@ -101,9 +92,9 @@ class DesktopFragment: Fragment(){
                     return@setOnDragListener true
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
-                    dropView.post {
-                        dropView.visibility = View.VISIBLE
-                    }
+//                    dropView.post {
+//                        dropView.visibility = View.VISIBLE
+//                    }
                     return@setOnDragListener true
                 }
             }
@@ -168,6 +159,17 @@ class DesktopFragment: Fragment(){
                 table.addView(space)
             }
         }
+
+        val sp = PreferenceManager.getDefaultSharedPreferences(context)
+
+        val path0 = sp.getString("file3_path", "")
+
+        if(path0 != ""){
+            val bmp0 = BitmapFactory.decodeFile(path0)
+            Handler(Looper.getMainLooper()).post {
+                view.background = BitmapDrawable(resources, bmp0)
+            }
+        }
     }
 
 
@@ -228,10 +230,13 @@ class DesktopFragment: Fragment(){
         }
     }
 
-
+    var droped = false
 
     private fun bindEmpty(view: View, h: Int, w: Int){
         view.tag = null
+
+        view.setOnClickListener {  }
+
         view.setOnDragListener{ _: View, dragEvent: DragEvent ->
 
             val action = dragEvent.action
@@ -244,6 +249,7 @@ class DesktopFragment: Fragment(){
 
             when(action){
                 DragEvent.ACTION_DRAG_STARTED -> {
+                    droped = false
                     return@setOnDragListener true
                 }
 
@@ -262,6 +268,8 @@ class DesktopFragment: Fragment(){
                     return@setOnDragListener true
                 }
                 DragEvent.ACTION_DROP -> {
+                    droped = true
+                    Log.i("Shad2", "drop")
                     view.setBackgroundResource(R.drawable.app_selector)
                     active = Position(h, w)
                     Thread(Runnable {
@@ -272,12 +280,15 @@ class DesktopFragment: Fragment(){
                 }
                 DragEvent.ACTION_DRAG_ENDED -> {
                     dropView.post {
+                        if(droped){
+                            dropView.findViewById<ImageView>(R.id.square_image).setImageDrawable(null)
+                            dropView.findViewById<TextView>(R.id.app_name).text = ""
+                        }
                         dropView.visibility = View.VISIBLE
                     }
                     return@setOnDragListener true
                 }
             }
-
             return@setOnDragListener false
         }
 
@@ -303,11 +314,11 @@ class DesktopFragment: Fragment(){
         if(info.imagePath == "" || !File(info.imagePath).exists()){
             img = when(info.type){
                 0 -> {
-                    val st = BufferedReader(InputStreamReader(URL("http://favicon.yandex.net/favicon/${info.value}?size=32&json=1").openConnection().getInputStream())).readLine()
+                    val st = BufferedReader(InputStreamReader(URL("http://favicon.yandex.net/favicon/${info.value}?size=120&json=1").openConnection().getInputStream())).readLine()
                     Log.i("Shad", st)
                     val img2 = if(st.contains("\"image\":\"")){
                         Log.i("Shad", "main")
-                        val tmp = ImageLoaderService.loadBitmap("http://favicon.yandex.net/favicon/${info.value}?size=32")
+                        val tmp = ImageLoaderService.loadBitmap("http://favicon.yandex.net/favicon/${info.value}?size=120")
                         if(tmp != null){
                             if(tmp.width != tmp.height){
                                 Bitmap.createBitmap(tmp, 0, tmp.height - tmp.width, tmp.width, tmp.width)
@@ -333,7 +344,8 @@ class DesktopFragment: Fragment(){
                             }
                             ?.drawable
                     getBitmapFromDrawable(bmp)?:
-                    getBitmapFromDrawable(context!!.packageManager.getApplicationIcon(info.value))!!
+                    getBitmapFromDrawable(context!!.packageManager.getApplicationIcon(info.value))?:
+                    BitmapFactory.decodeResource(resources, R.drawable.default_web_icon)
                 }
                 else -> {
                     BitmapFactory.decodeResource(resources, R.drawable.default_contact_icon)

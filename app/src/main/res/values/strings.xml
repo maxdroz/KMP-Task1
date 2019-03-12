@@ -72,6 +72,7 @@
     <string name="upd_bkg_now">Update background image now</string>
     <string name="wait">Wait a minute for background to update</string>
     <string name="wp6">To add app to Desktop, open context menu in a grid or linear layout\nTo add URL or contact long click on place? where you want to put it.\nTo Delete or move icon, long press it</string>
+    <string name="already_updating">Background is already updating</string>
 
     <string-array name="sorts">
         <item>No sort</item>

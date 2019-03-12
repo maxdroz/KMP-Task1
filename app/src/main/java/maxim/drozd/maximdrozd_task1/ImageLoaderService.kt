@@ -11,7 +11,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Bitmap
 import android.support.v7.preference.PreferenceManager
 import android.util.Log
-import maxim.drozd.maximdrozd_task1.DB.AppDatabase
+import maxim.drozd.maximdrozd_task1.db.AppDatabase
 import maxim.drozd.maximdrozd_task1.launcher.LauncherActivity
 import java.io.*
 import java.net.URL
@@ -43,11 +43,13 @@ class JobOffsetService: JobService(){
 
 class ImageLoaderService: JobService() {
     override fun onStopJob(params: JobParameters?): Boolean {
+        LauncherActivity.updatingBackground = false
         return false
     }
 
     override fun onStartJob(params: JobParameters?): Boolean {
 
+        LauncherActivity.updatingBackground = true
         Log.i("ShadJobs", "in main job")
         Thread(Runnable {
             Log.i("Shad", "job2")
@@ -57,14 +59,6 @@ class ImageLoaderService: JobService() {
             sp.edit().putLong("last_launch", System.currentTimeMillis()).apply()
 
             val iconsPaths = AppDatabase.getInstance(this).desktopAppInfo().getAppsImagePahs()
-
-            cacheDir.listFiles().forEach { file ->
-                if(file.isFile){
-                    if(file.absolutePath.indexOf("file") != -1 || (file.absolutePath.indexOf("icon") != -1 && file.absolutePath !in iconsPaths)){
-                        file.delete()
-                    }
-                }
-            }
 
             val urlId = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString("preference_background_source", "0")
             val url: String = when(urlId){
@@ -85,16 +79,27 @@ class ImageLoaderService: JobService() {
             val bmp3 = loadBitmap(url)
 
             val bmpF1= File.createTempFile("file1", ".png")
-            bmp1?.compress(Bitmap.CompressFormat.PNG, 0, bmpF1.outputStream())
             sp.edit().putString("file1_path", bmpF1.absolutePath).apply()
 
             val bmpF2= File.createTempFile("file2", ".png")
-            bmp2?.compress(Bitmap.CompressFormat.PNG, 0, bmpF2.outputStream())
             sp.edit().putString("file2_path", bmpF2.absolutePath).apply()
 
             val bmpF3= File.createTempFile("file3", ".png")
-            bmp3?.compress(Bitmap.CompressFormat.PNG, 0, bmpF3.outputStream())
             sp.edit().putString("file3_path", bmpF3.absolutePath).apply()
+
+            cacheDir.listFiles().forEach { file ->
+                if(file.isFile){
+                    if(file.absolutePath.indexOf("file") != -1 || (file.absolutePath.indexOf("icon") != -1 && file.absolutePath !in iconsPaths)){
+                        file.delete()
+                    }
+                }
+            }
+
+
+            bmp1?.compress(Bitmap.CompressFormat.PNG, 0, bmpF1.outputStream())
+            bmp2?.compress(Bitmap.CompressFormat.PNG, 0, bmpF2.outputStream())
+            bmp3?.compress(Bitmap.CompressFormat.PNG, 0, bmpF3.outputStream())
+
 
             sendBroadcast(Intent(LauncherActivity.UPDATE_BACKGROUND))
 
