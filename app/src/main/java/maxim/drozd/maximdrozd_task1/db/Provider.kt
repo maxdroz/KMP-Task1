@@ -1,7 +1,6 @@
 package maxim.drozd.maximdrozd_task1.db
 
 import android.content.ContentProvider
-import android.content.ContentUris
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
@@ -11,14 +10,13 @@ import android.content.UriMatcher
 class Provider: ContentProvider(){
 
     companion object {
-        const val TABLE_NAME = "AppInfo"
-        const val AUTHORITY = "maxim.drozd.maximdrozd_task1"
+        private const val TABLE_NAME = "AppInfo"
+        private const val AUTHORITY = "maxim.drozd.maximdrozd_task1"
 
         private const val CODE_LAST_LAUNCHED_APP = 1
         private const val CODE_LAUNCHED_APPS = 2
         private const val CODE_UPDATE_APP = 3
 
-        private val URI = Uri.parse("content://$AUTHORITY/$TABLE_NAME")
         private val URI_MATCHER = UriMatcher(UriMatcher.NO_MATCH)
 
         init {

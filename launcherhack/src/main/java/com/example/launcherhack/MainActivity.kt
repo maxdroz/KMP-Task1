@@ -1,11 +1,15 @@
 package com.example.launcherhack
 
 import android.content.ContentValues
+import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -81,7 +85,7 @@ class MainActivity : AppCompatActivity() {
                     sb.appendln(app.launchCount)
                     sb.appendln()
                 }
-                val s = sb.substring(0, sb.lastIndex - 2)
+                val s = sb.substring(0, sb.lastIndex - 1)
                 runOnUiThread {
                     apps_list.text = s
                 }
@@ -103,7 +107,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun hackData(packageName: String, count: Int){
         Thread(Runnable {
-
             val appUri = Uri.parse("$MAIN_URI/update/$packageName")
 
             val values = ContentValues()
@@ -147,6 +150,16 @@ class MainActivity : AppCompatActivity() {
             cursor?.close()
 
         return ans
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        startActivity(Intent(this, ProfileActivity::class.java))
+        return true
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu, menu)
+        return true
     }
 }
 
