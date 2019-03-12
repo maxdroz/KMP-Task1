@@ -47,8 +47,40 @@
             android:title="@string/popular_area_height"
             android:inputType="number"
             android:summary="@string/popular_area_height_desc"/>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/background">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="preference_background_diff"
+            android:title="@string/pref_background"
+            android:summary="@string/pref_background_decs"/>
 
+        <ListPreference
+            android:key="preference_background_source"
+            android:entries="@array/sources"
+            android:defaultValue="0"
+            android:entryValues="@array/sources_val"
+            android:dialogTitle="@string/source_site"
+            android:title="@string/bkg_img_source"
+            android:summary="@string/bkg_img_source_desc"/>
+        <ListPreference
 
+            android:key="preference_background_freq"
+            android:entries="@array/timings"
+            android:defaultValue="900000"
+            android:entryValues="@array/timings_val"
+            android:dialogTitle="@string/bkg_frq_dt"
+            android:title="@string/bkg_frq"
+            android:summary="@string/bkg_frq_desk"/>
+
+        <!--suppress AndroidElementNotAllowed -->
+        <maxim.drozd.maximdrozd_task1.BroadcastPreference
+            android:title="@string/upd_bkg_now">
+            <!--suppress AndroidElementNotAllowed -->
+            <intent
+                android:action="maxim.drozd.maximdrozd_task1.upadte_backgeround_once" />
+        </maxim.drozd.maximdrozd_task1.BroadcastPreference>
 
     </PreferenceCategory>
 </PreferenceScreen>

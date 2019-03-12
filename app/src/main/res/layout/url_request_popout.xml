@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:paddingTop="@dimen/offset"
+        android:layout_height="wrap_content"
+        android:text="@string/link_name"
+        android:paddingStart="@dimen/offset"
+        android:paddingEnd="@dimen/offset"/>
+
+    <EditText
+        android:id="@+id/url_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Yandex"
+        android:inputType="none" />
+
+    <TextView
+        android:paddingTop="@dimen/offset"
+        android:text="@string/web_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/offset"
+        android:paddingEnd="@dimen/offset"/>
+
+    <EditText
+        android:id="@+id/url_url"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="https://yandex.by/"
+        android:inputType="textUri" />
+</LinearLayout>

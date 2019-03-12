@@ -62,4 +62,27 @@
     <string name="delete_menu">Удалить</string>
     <string name="frq_menu">Частота</string>
     <string name="about_menu">О приложении</string>
+    <string name="pref_background_decs">Если включено, задний фон у разных экранов будет разный</string>
+    <string name="pref_background">Разный фон</string>
+    <string name="add_to_dsk_menu">Добавить на рабочий стол</string>
+    <string name="no_space_desktop">На рабочем столе нет места</string>
+    <string name="yes">Да</string>
+    <string name="delete_icon">Удалить иконку?</string>
+    <string name="link_name">Название ссылки:</string>
+    <string name="web_address">Адресс ссылки:</string>
+    <string name="done">Готово</string>
+    <string name="icon_type">Выберите тип иконки</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Отменв</string>
+    <string name="desktop">Рабочий стол</string>
+    <string name="unable_to_start">Запустить приложение невозможно</string>
+    <string name="source_site">Сайты - источники</string>
+    <string name="bkg_img_source">Источкини картинок фона</string>
+    <string name="bkg_img_source_desc">Случайные изображения из выбранных источников будут отрображены на фоне</string>
+    <string name="bkg_frq_dt">Обновлять задний фон каждые&#8230;</string>
+    <string name="bkg_frq">Частота смены рабочего стола</string>
+    <string name="bkg_frq_desk">Этот параметр определяет частоту смены изображений на фоне</string>
+    <string name="upd_bkg_now">Обновить фон прямо сейчас</string>
+    <string name="wait">Подождите минутку, достаем изображение из паралелльной вселенной</string>
+    <string name="wp6">Что бы добавить приложение на рабочий стол, вызовите контекстное меню у приложения в "сетке" или "списке" \n Для добавления котакта или ссылки, сделайте долгий клик на место, куда хотите поместить его.\nДля перемещения или удаления иконки, сделайте долгий клик по этой иконке</string>
 </resources>
