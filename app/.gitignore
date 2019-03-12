@@ -1,8 +1,1 @@
-/build/generated
-/build/intermediates
-/build/reports
-/build/tmp
-/build/output/checkstyle
-/build/output/findbugs
-/build/output/logs
-/build/output/pmd
+/build

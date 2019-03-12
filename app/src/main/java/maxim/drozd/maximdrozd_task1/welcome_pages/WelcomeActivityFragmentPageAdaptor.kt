@@ -8,12 +8,13 @@ class WelcomeActivityFragmentPageAdaptor(fm: FragmentManager?) : FragmentPagerAd
     override fun getItem(position: Int): Fragment {
         return when (position) {
             1 -> WelcomePageSecondFragment()
-            3 -> WelcomePageThirdFragment()
+            4 -> WelcomePageThirdFragment()
             2 -> WelcomePageFifthFragment()
-            4 -> WelcomePageFourthFragment()
+            3 -> WelcomePageSixFragment()
+            5 -> WelcomePageFourthFragment()
             else -> WelcomePageFirstFragment()
         }
     }
 
-    override fun getCount(): Int = 5
+    override fun getCount(): Int = 6
 }
