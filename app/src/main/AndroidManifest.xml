@@ -41,12 +41,21 @@
         <activity android:name=".welcome_pages.WelcomePageActivity" />
         <activity android:name=".ProfileActivity"
             android:theme="@style/AppThemeNoActionBar">
+            <intent-filter>
+                <!--<action android:name="maxim.drozd.action_start_profile_activity"/>-->
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="my-app"
+                    android:host="deeplink"/>
+            </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".launcher.LauncherActivity" />
         </activity>
         <activity android:name=".PreferencesActivity"
             android:theme="@style/AppTheme">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".launcher.LauncherActivity" />
@@ -70,6 +79,13 @@
             android:authorities="maxim.drozd.maximdrozd_task2"
             android:name=".db.ProfileProvider"
             android:permission="maxim.drozd.maximdrozd_task1.profile"/>
+
+        <receiver android:name=".SilentPushReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.action.ymp.SILENT_PUSH_RECEIVE"/>
+            </intent-filter>
+        </receiver>
 
         <meta-data
             android:name="io.fabric.ApiKey"

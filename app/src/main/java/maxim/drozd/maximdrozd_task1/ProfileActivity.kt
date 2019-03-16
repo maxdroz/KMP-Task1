@@ -1,15 +1,34 @@
 package maxim.drozd.maximdrozd_task1
 
-import android.content.Intent
+import android.content.*
 import android.net.Uri
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import com.yandex.metrica.YandexMetrica
+import com.yandex.metrica.push.YandexMetricaPush
 import kotlinx.android.synthetic.main.profile_content.*
 import kotlinx.android.synthetic.main.profile_layout.*
+import java.lang.Exception
 
 class ProfileActivity : AppCompatActivity() {
+
+    companion object {
+        const val FILTER_RECIEVER = "maxim.drozd.maximdrozd_task1.silentPushFilter"
+        const val PREFERENCES_TEXT = "maxim.drozd.maximdrozd_task1.preference_edit"
+    }
+
+
+    private val receiver = object: BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            Log.i("Shad", "in main secondary receiver")
+            val payload = intent?.getStringExtra(YandexMetricaPush.EXTRA_PAYLOAD)
+            silentPushText.text = payload
+            Log.i("Shad", payload)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -24,6 +43,10 @@ class ProfileActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         val name = resources.getString(R.string.name)
         supportActionBar?.title = name
+
+        Thread(Runnable {
+            silentPushText.text = PreferenceManager.getDefaultSharedPreferences(this).getString(PREFERENCES_TEXT, "Here will be text")
+        }).start()
 
         callMobile.setOnClickListener {
             YandexMetrica.reportEvent("Event: Mobile phone clicked")
@@ -78,10 +101,20 @@ class ProfileActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         YandexMetrica.resumeSession(this)
+
+        val filter = IntentFilter(FILTER_RECIEVER)
+        try{
+            registerReceiver(receiver, filter)
+        } catch (e: Exception){
+        }
     }
 
 
     override fun onPause() {
+        try {
+            unregisterReceiver(receiver)
+        } catch (e: Exception){
+        }
         YandexMetrica.pauseSession(this)
         super.onPause()
     }
