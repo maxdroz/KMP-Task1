@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "796992925866",
+    "firebase_url": "https://launcher-53024.firebaseio.com",
+    "project_id": "launcher-53024",
+    "storage_bucket": "launcher-53024.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796992925866:android:8ca80390548f6ddc",
+        "android_client_info": {
+          "package_name": "maxim.drozd.maximdrozd_task1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "796992925866-h2vtvketkm56hjhql9aerk61rn8o2hbt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMuX3QPxRNHlJnxImT228Cs8vpjT5rZFo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
