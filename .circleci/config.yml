@@ -118,8 +118,8 @@ jobs:
       - run:
          name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
          command: sudo chmod +x ./gradlew
-      - restore_cache:
-          key: app-{{ checksum ".circleci/config.yml" }}
+#      - restore_cache:
+#          key: app-{{ checksum ".circleci/config.yml" }}
       - run:
           name: Build
           command: ./gradlew assembleRelease
