@@ -1,11 +1,14 @@
 package maxim.drozd.maximdrozd_task1.launcher
 
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.content.*
 import android.content.pm.ApplicationInfo
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -23,11 +26,14 @@ import maxim.drozd.maximdrozd_task1.welcome_pages.WelcomePageActivity
 import android.view.ContextMenu
 import android.view.Menu
 import android.net.Uri
+import android.os.Build
 import android.os.PersistableBundle
 import android.provider.ContactsContract
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.view.ViewPager
 import android.util.Log
 import android.support.v7.widget.RecyclerView
@@ -357,6 +363,29 @@ class LauncherActivity : AppCompatActivity(), ClickListener {
                 YandexMetrica.reportEvent("Event: Settings clicked")
                 startActivity(Intent(this, PreferencesActivity::class.java))
             }
+            R.id.notif_1, R.id.notif_2 -> {
+                var notif = if(Build.VERSION.SDK_INT >= 26) {
+                    val channel = NotificationChannel("first", "first", NotificationManager.IMPORTANCE_DEFAULT)
+                    val notificationManager: NotificationManager =
+                            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.createNotificationChannel(channel)
+
+                    NotificationCompat.Builder(this, "first")
+                } else {
+                    NotificationCompat.Builder(this)
+                }
+                notif = notif.setSmallIcon(R.drawable.bell)
+                        .setContentTitle("Пробное уведомление")
+                        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        .setContentText("Текст пробного уведомления")
+                if(R.id.notif_2 == item.itemId){
+                    notif = notif.setSmallIcon(R.drawable.bullhorn)
+                            .setColor(Color.rgb(255, 87, 0))
+                }
+
+                NotificationManagerCompat.from(this).notify(0, notif.build())
+            }
+
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true

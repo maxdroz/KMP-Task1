@@ -9,6 +9,7 @@ import com.microsoft.appcenter.analytics.Analytics
 import com.microsoft.appcenter.AppCenter
 import android.R
 import com.crashlytics.android.Crashlytics
+import com.yandex.metrica.push.YandexMetricaPush
 import io.fabric.sdk.android.Fabric
 
 
@@ -30,6 +31,9 @@ class AppMetrica: Application() {
         val config = YandexMetricaConfig.newConfigBuilder(API_key).build()
         // Инициализация AppMetrica SDK.
         YandexMetrica.activate(applicationContext, config)
+
+        YandexMetricaPush.init(applicationContext)
+
         // Отслеживание активности пользователей.
         YandexMetrica.enableActivityAutoTracking(this)
     }
